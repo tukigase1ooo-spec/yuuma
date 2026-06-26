@@ -233,16 +233,12 @@ body {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .sns-popup {
-  position: absolute; bottom: calc(100% + 10px); left: 0; z-index: 200;
+  margin-top: 10px;
   background: #fff; border: 2px solid var(--border); border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.15);
-  padding: 14px 16px; min-width: 230px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  padding: 14px 16px;
   display: flex; align-items: center; gap: 14px;
-  opacity: 0; pointer-events: none;
-  transform: translateY(6px);
-  transition: opacity .18s, transform .18s;
 }
-.sns-popup-wrap:hover .sns-popup { opacity: 1; pointer-events: auto; transform: translateY(0); }
 .sns-popup-avatar {
   width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
   border: 2px solid var(--border); flex-shrink: 0; background: var(--yellow-pale);
