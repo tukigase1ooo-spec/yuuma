@@ -418,7 +418,8 @@ const SB      = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_
 const SB_JSON = Object.assign({ 'Content-Type': 'application/json' }, SB);
 
 let memberNames = [], genreList = [], favoriteList = [];
-let existingData = {}, illustsCurrent = [], currentMember = '', pendingFile = null;
+let existingData = {}, memberMap = {};
+let illustsCurrent = [], currentMember = '', currentMemberId = null, pendingFile = null;
 let selectedGenres = new Set();
 
 function escH(s) {
@@ -499,8 +500,10 @@ function setupAC(inputId, listId, getItems, opts) {
 }
 
 function onNamePick(name) {
-  currentMember = name; hideMsg('form-msg');
-  const existing = existingData[name];
+  currentMember = name;
+  currentMemberId = memberMap[name] || null;
+  hideMsg('form-msg');
+  const existing = existingData[currentMemberId];
   const btn = document.getElementById('btn-submit');
   if (existing) {
     selectedGenres = new Set(
@@ -575,18 +578,23 @@ function updateSelectedContent() {
 
 async function init() {
   try {
-    const [creatorData, genData, favData] = await Promise.all([
-      fetch(SUPABASE_URL + '/rest/v1/creators?select=name,genres,interests&order=id.asc', { headers: SB }).then(r => r.json()),
-      fetch(SUPABASE_URL + '/rest/v1/genres?select=name&order=name.asc',                  { headers: SB }).then(r => r.json()),
-      fetch(SUPABASE_URL + '/rest/v1/favorites?select=name&order=name.asc',               { headers: SB }).then(r => r.json()),
+    const [memberData, creatorData, genData, favData] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/members?select=id,name&order=id.asc',               { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/creators?select=id,genres,favorites&order=id.asc',  { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/genres?select=name&order=name.asc',                 { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/favorites?select=name&order=name.asc',              { headers: SB }).then(r => r.json()),
     ]);
-    memberNames  = Array.isArray(creatorData) ? creatorData.map(r => r.name) : [];
+    memberNames = []; memberMap = {};
+    if (Array.isArray(memberData)) {
+      memberData.forEach(r => { memberNames.push(r.name); memberMap[r.name] = r.id; });
+    }
     genreList    = Array.isArray(genData) ? genData.map(r => r.name) : [];
     favoriteList = Array.isArray(favData) ? favData.map(r => r.name) : [];
+    existingData = {};
     if (Array.isArray(creatorData)) {
       creatorData.forEach(r => {
-        const favs = r.interests ? r.interests.split('、').map(s => s.trim()).filter(Boolean) : [];
-        existingData[r.name] = {
+        const favs = r.favorites ? r.favorites.split('、').map(s => s.trim()).filter(Boolean) : [];
+        existingData[r.id] = {
           genre: r.genres || '',
           favorite1: favs[0] || '',
           favorite2: favs[1] || '',
@@ -627,8 +635,8 @@ async function submitForm() {
   const fav3  = document.getElementById('f-fav3').value.trim();
 
   if (!name)  { showMsg('form-msg', 'error', 'メンバー名を入力して候補から選択してください'); return; }
-  if (!memberNames.some(s => s.toLowerCase() === name.toLowerCase())) {
-    showMsg('form-msg', 'error', '「' + name + '」はメンバー名簿に存在しません');
+  if (!currentMemberId) {
+    showMsg('form-msg', 'error', 'メンバーを候補リストから選択してください');
     document.getElementById('f-name').classList.add('invalid'); return;
   }
   if (!selectedGenres.size) { showMsg('form-msg', 'error', '描いているジャンルを1つ以上選択してください'); return; }
@@ -644,15 +652,15 @@ async function submitForm() {
       fav2 ? ensureTag('favorites', fav2, favoriteList) : Promise.resolve(),
       fav3 ? ensureTag('favorites', fav3, favoriteList) : Promise.resolve()
     ]);
-    const interests = [fav1, fav2, fav3].filter(Boolean).join('、');
-    const body = { genres: genreArr.join(', '), interests };
-    const res = await fetch(SUPABASE_URL + '/rest/v1/creators?name=eq.' + encodeURIComponent(name), {
+    const favoritesStr = [fav1, fav2, fav3].filter(Boolean).join('、');
+    const body = { genres: genreArr.join(', '), favorites: favoritesStr };
+    const res = await fetch(SUPABASE_URL + '/rest/v1/creators?id=eq.' + currentMemberId, {
       method: 'PATCH',
       headers: Object.assign({ 'Prefer': 'return=minimal' }, SB_JSON),
       body: JSON.stringify(body)
     });
     if (res.ok) {
-      existingData[name] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'' };
+      existingData[currentMemberId] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'' };
       showMsg('form-msg', 'success', '登録しました！「共通リスト」で確認できます。');
       btn.textContent = '更新する'; onNamePick(name);
     } else {
@@ -662,7 +670,7 @@ async function submitForm() {
   } catch (e) { showMsg('form-msg', 'error', 'ネットワークエラー：' + e.message); }
   finally {
     btn.disabled = false;
-    if (btn.textContent === '送信中...') btn.textContent = existingData[document.getElementById('f-name').value.trim()] ? '更新する' : '登録する';
+    if (btn.textContent === '送信中...') btn.textContent = existingData[currentMemberId] ? '更新する' : '登録する';
   }
 }
 

@@ -417,16 +417,23 @@ function setupSimAC() {
 
 async function loadData() {
   try {
-    const [creatorData, illData] = await Promise.all([
-      fetch(SUPABASE_URL + '/rest/v1/creators?select=name,interests,genres,link&order=id.asc', { headers: SB_HEADERS }).then(r => r.json()),
-      fetch(SUPABASE_URL + '/rest/v1/member_illustrations?select=*&order=created_at.asc',      { headers: SB_HEADERS }).then(r => r.json())
+    const [memberData, creatorData, illData] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/members?select=id,name,discord_url&order=id.asc',    { headers: SB_HEADERS }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/creators?select=id,genres,favorites&order=id.asc',   { headers: SB_HEADERS }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/member_illustrations?select=*&order=created_at.asc', { headers: SB_HEADERS }).then(r => r.json())
     ]);
 
-    allData = Array.isArray(creatorData) ? creatorData.map(row => {
-      const favs    = row.interests ? row.interests.split('、').map(s => s.trim()).filter(Boolean) : [];
-      const genres  = row.genres    ? row.genres.split(',').map(s => s.trim()).filter(Boolean)    : [];
-      return { member_name: row.name, genres, favorites: favs, link: row.link };
-    }) : [];
+    const creatorMap = {};
+    if (Array.isArray(creatorData)) {
+      creatorData.forEach(r => { creatorMap[r.id] = r; });
+    }
+
+    allData = Array.isArray(memberData) ? memberData.map(row => {
+      const creator = creatorMap[row.id] || {};
+      const favs   = creator.favorites ? creator.favorites.split('、').map(s => s.trim()).filter(Boolean) : [];
+      const genres = creator.genres    ? creator.genres.split(',').map(s => s.trim()).filter(Boolean)    : [];
+      return { member_name: row.name, genres, favorites: favs, link: row.discord_url };
+    }).filter(d => d.genres.length > 0 || d.favorites.length > 0) : [];
 
     memberUrls = {};
     allData.forEach(d => { memberUrls[d.member_name] = d.link; });
