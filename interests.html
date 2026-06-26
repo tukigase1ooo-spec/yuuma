@@ -216,6 +216,7 @@ body {
 
 /* ── SNSリンク ── */
 .sns-row { margin-top: 10px; padding-top: 10px; border-top: 2px solid var(--border); }
+.sns-popup-wrap { position: relative; display: inline-block; }
 .sns-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 7px 14px; border-radius: 24px; text-decoration: none;
@@ -231,6 +232,28 @@ body {
   font-size: 11px; font-weight: 400; color: rgba(255,255,255,.7);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.sns-popup {
+  position: absolute; bottom: calc(100% + 10px); left: 0; z-index: 200;
+  background: #fff; border: 2px solid var(--border); border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+  padding: 14px 16px; min-width: 230px;
+  display: flex; align-items: center; gap: 14px;
+  opacity: 0; pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .18s, transform .18s;
+}
+.sns-popup-wrap:hover .sns-popup { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.sns-popup-avatar {
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--border); flex-shrink: 0; background: var(--yellow-pale);
+}
+.sns-popup-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.sns-popup-username { font-size: 13px; font-weight: 800; color: var(--ink); }
+.sns-popup-link {
+  font-size: 11px; color: var(--purple); text-decoration: none; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.sns-popup-link:hover { text-decoration: underline; }
 
 /* ── イラストサムネイル ── */
 .card-illust { margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--border); }
@@ -378,6 +401,11 @@ let simName = '';
 
 function escH(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function getXUsername(url) {
+  const m = String(url).match(/(?:twitter\.com|x\.com)\/([A-Za-z0-9_]+)/);
+  return m ? m[1] : null;
 }
 
 function setupSimAC() {
@@ -614,11 +642,25 @@ function renderCards() {
       const moreBtn = rest > 0 ? '<div class="illust-more" data-member="' + escH(d.member_name) + '" data-idx="0">+' + rest + '</div>' : '';
       illustHtml = '<div class="card-illust"><div class="card-illust-label">イラスト</div><div class="illust-thumbs">' + thumbs + moreBtn + '</div></div>';
     }
-    const snsHtml = d.sns_url
-      ? '<div class="sns-row"><a class="sns-btn" href="' + escH(d.sns_url) + '" target="_blank" rel="noopener">'
+    const snsHtml = (() => {
+      if (!d.sns_url) return '';
+      const uname = getXUsername(d.sns_url);
+      const avatarSrc = uname ? 'https://unavatar.io/x/' + encodeURIComponent(uname) : '';
+      const avatarImg = avatarSrc
+        ? '<img class="sns-popup-avatar" src="' + escH(avatarSrc) + '" alt="' + escH(uname) + '" onerror="this.src=\'\';">'
+        : '';
+      const popup = '<div class="sns-popup">'
+        + avatarImg
+        + '<div class="sns-popup-info">'
+        + (uname ? '<div class="sns-popup-username">@' + escH(uname) + '</div>' : '')
+        + '<a class="sns-popup-link" href="' + escH(d.sns_url) + '" target="_blank" rel="noopener">プロフィールを開く →</a>'
+        + '</div></div>';
+      return '<div class="sns-row"><div class="sns-popup-wrap">'
+        + '<a class="sns-btn" href="' + escH(d.sns_url) + '" target="_blank" rel="noopener">'
         + '<span class="sns-icon">𝕏</span><span class="sns-label">X / Twitter</span>'
-        + '<span class="sns-url">' + escH(d.sns_url.replace(/^https?:\/\//, '')) + '</span></a></div>'
-      : '';
+        + '<span class="sns-url">' + escH(d.sns_url.replace(/^https?:\/\//, '')) + '</span></a>'
+        + popup + '</div></div>';
+    })();
     return '<div class="member-card' + (hasFilter && d.score > 0 ? ' matched' : '') + '">'
       + '<div class="card-top"><div class="card-name">' + nameHtml + '</div>' + scoreBadge + '</div>'
       + '<div class="card-section"><div class="card-section-label">描いているジャンル</div>' + genreHtml + '</div>'
