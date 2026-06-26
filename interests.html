@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ユウマ鯖 共通リスト</title>
+<style>
+:root {
+  --ink:        #1C1400;
+  --ink-soft:   #5C4810;
+  --bg:         #FFFFF2;
+  --yellow:     #FFD000;
+  --yellow-hi:  #FFE566;
+  --yellow-lt:  #FFF4C0;
+  --yellow-pale:#FFFCE8;
+  --purple:     #5C4EE5;
+  --pur-light:  #EDE9FC;
+  --pur-border: #C5BDF0;
+  --pur-dark:   #3730A3;
+  --surface:    #FFFFFF;
+  --muted:      #7A6820;
+  --border:     #EAD890;
+  --radius:     18px;
+  --shadow:     0 2px 20px rgba(80,60,0,.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(circle, #FFE566 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── ヒーロー ── */
+.hero {
+  background: linear-gradient(135deg, #FFB800 0%, #FFD600 45%, #FFE566 75%, #FFF8C0 100%);
+  padding: 44px 20px 36px;
+  color: var(--ink);
+  position: relative; overflow: hidden;
+  border-radius: 0 0 36px 36px;
+  margin-bottom: 28px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,.65) 0%, transparent 62%);
+  top: -160px; right: -80px; pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(255,140,0,.22) 0%, transparent 65%);
+  bottom: -90px; left: 5%; pointer-events: none;
+}
+.hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+.hero-title { font-size: 32px; font-weight: 900; letter-spacing: -.03em; margin-bottom: 6px; line-height: 1.1; }
+.hero-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 22px; font-weight: 500; }
+.hero-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-nav a {
+  font-size: 12px; font-weight: 700; padding: 7px 16px; border-radius: 24px;
+  text-decoration: none; transition: all .15s;
+  border: 2px solid rgba(0,0,0,.14); color: var(--ink);
+  background: rgba(255,255,255,.55); backdrop-filter: blur(4px);
+}
+.hero-nav a:hover { background: rgba(255,255,255,.88); border-color: rgba(0,0,0,.22); transform: translateY(-1px); }
+.hero-nav a.cta { background: var(--purple); border-color: transparent; color: #fff; }
+.hero-nav a.cta:hover { background: var(--pur-dark); }
+
+/* ── コンテンツ ── */
+.content { max-width: 900px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ── 統合フィルターカード ── */
+.filter-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow);
+}
+.filter-card-hdr {
+  background: linear-gradient(90deg, var(--yellow-lt) 0%, var(--yellow-pale) 100%);
+  border-bottom: 2px solid var(--border);
+  padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+}
+.filter-card-title { font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+.filter-body { padding: 16px 18px; }
+.filter-section { margin-bottom: 14px; }
+.filter-section:last-child { margin-bottom: 0; }
+.filter-section-label {
+  font-size: 10px; font-weight: 800; color: var(--muted);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.multi-note {
+  font-size: 9px; font-weight: 700; background: var(--pur-light);
+  color: var(--purple); border: 1.5px solid var(--pur-border);
+  border-radius: 8px; padding: 1px 6px; text-transform: none; letter-spacing: 0;
+}
+.sim-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sim-input {
+  font-size: 13px; padding: 7px 14px;
+  border: 2px solid var(--border); border-radius: 24px;
+  font-family: inherit; outline: none; flex: 1; min-width: 140px;
+  background: var(--yellow-pale); color: var(--ink); transition: border-color .15s;
+}
+.sim-input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255,208,0,.18); }
+.sim-ac-wrap { position: relative; flex: 1; }
+.ac-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: #fff; border: 2px solid var(--border); border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(80,60,0,.12); max-height: 220px; overflow-y: auto;
+  display: none;
+}
+.ac-item {
+  padding: 9px 14px; font-size: 13px; cursor: pointer;
+  border-bottom: 1px solid var(--border); transition: background .1s;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.ac-active { background: var(--yellow-lt); }
+.ac-empty { padding: 9px 14px; font-size: 12px; color: var(--muted); }
+.btn-sim {
+  font-size: 12px; padding: 7px 18px; border-radius: 24px; font-weight: 700;
+  background: var(--purple); color: #fff; border: none;
+  cursor: pointer; font-family: inherit; flex-shrink: 0; transition: background .15s;
+}
+.btn-sim:hover { background: var(--pur-dark); }
+.btn-clear {
+  font-size: 12px; padding: 6px 14px; border-radius: 24px; font-weight: 600;
+  background: var(--yellow-pale); color: var(--ink-soft);
+  border: 2px solid var(--border); cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.btn-clear:hover { background: var(--yellow-lt); border-color: var(--yellow); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 12px; padding: 5px 14px; border-radius: 24px;
+  border: 2px solid var(--border); background: var(--yellow-pale);
+  color: var(--ink-soft); cursor: pointer; transition: all .12s;
+  user-select: none; display: flex; align-items: center; gap: 5px; font-weight: 600;
+}
+.chip:hover { background: var(--yellow-lt); border-color: var(--yellow); color: var(--ink); }
+.chip.active { background: var(--yellow); color: var(--ink); border-color: #CCA800; font-weight: 700; }
+.chip .cnt { font-size: 10px; opacity: .75; }
+.no-chips { font-size: 12px; color: var(--muted); padding: 4px 0; }
+
+/* ── 選択中フィルター ── */
+.active-filters {
+  margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--border);
+  display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;
+}
+.active-filters-label {
+  font-size: 11px; font-weight: 800; color: var(--muted); flex-shrink: 0; padding-top: 5px;
+}
+.active-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.active-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; padding: 4px 8px 4px 12px; border-radius: 24px;
+}
+.active-tag.type-name  { background: var(--purple); color: #fff; }
+.active-tag.type-genre { background: var(--pur-light); color: var(--purple); border: 2px solid var(--pur-border); }
+.active-tag.type-fav   { background: var(--yellow); color: var(--ink); border: 2px solid #CCA800; }
+.active-tag-x {
+  font-size: 12px; line-height: 1; cursor: pointer; opacity: .65;
+  background: none; border: none; color: inherit; padding: 0; font-weight: 900;
+}
+.active-tag-x:hover { opacity: 1; }
+
+/* ── 結果ヘッダー ── */
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.result-count { font-size: 13px; color: var(--muted); font-weight: 600; }
+.sort-note { font-size: 12px; color: var(--purple); font-weight: 700; }
+
+/* ── メンバーカード ── */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.member-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+  box-shadow: var(--shadow);
+}
+.member-card:hover {
+  border-color: var(--yellow); transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(80,60,0,.13);
+}
+.member-card.matched { border-color: var(--yellow); box-shadow: 0 2px 20px rgba(255,208,0,.2); }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.card-name { font-size: 14px; font-weight: 800; }
+.card-name a { color: var(--purple); text-decoration: none; }
+.card-name a:hover { text-decoration: underline; }
+.score-badge {
+  font-size: 10px; padding: 3px 10px; border-radius: 12px;
+  background: var(--yellow); color: var(--ink); flex-shrink: 0; font-weight: 800;
+  border: 1.5px solid #CCA800;
+}
+.card-section { margin-bottom: 10px; }
+.card-section:last-child { margin-bottom: 0; }
+.card-section-label {
+  font-size: 10px; font-weight: 800; color: var(--muted);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px;
+}
+.tag { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+.tag.genre { background: var(--pur-light); border: 1.5px solid var(--pur-border); color: var(--purple); }
+.tag.genre.hit { background: var(--purple); color: #fff; border-color: var(--purple); }
+.tag.fav { background: var(--yellow-pale); border: 1.5px solid var(--border); color: var(--ink-soft); }
+.tag.fav.hit { background: var(--yellow); color: var(--ink); border-color: #CCA800; }
+.tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.empty-tag { font-size: 11px; color: var(--muted); }
+
+.no-result { text-align: center; color: var(--muted); padding: 56px 16px; font-size: 14px; }
+.loading { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+/* ── イラストサムネイル ── */
+.card-illust { margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--border); }
+.card-illust-label {
+  font-size: 10px; font-weight: 800; color: var(--muted);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px;
+}
+.illust-thumbs { display: flex; gap: 5px; flex-wrap: nowrap; }
+.illust-thumb-item {
+  width: 58px; height: 58px; border-radius: 10px; overflow: hidden;
+  flex-shrink: 0; cursor: pointer; border: 2px solid var(--border);
+  transition: opacity .15s, transform .12s;
+}
+.illust-thumb-item:hover { opacity: .85; transform: scale(1.06); }
+.illust-thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.illust-more {
+  width: 58px; height: 58px; border-radius: 10px;
+  background: var(--yellow-lt); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--ink-soft); font-weight: 800;
+  flex-shrink: 0; cursor: pointer; transition: background .15s;
+}
+.illust-more:hover { background: var(--yellow-hi); border-color: var(--yellow); }
+
+/* ── ライトボックス ── */
+.lightbox {
+  display: none; position: fixed; inset: 0;
+  background: rgba(28,20,0,.82); z-index: 500;
+  align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.lightbox.show { display: flex; }
+.lightbox-inner {
+  position: relative; max-width: min(90vw, 700px);
+  max-height: 90vh; background: var(--surface);
+  border-radius: 20px; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(28,20,0,.4);
+}
+.lightbox-img { max-width: 100%; max-height: calc(90vh - 64px); object-fit: contain; display: block; }
+.lightbox-footer {
+  padding: 12px 16px; background: var(--surface);
+  border-top: 3px solid var(--yellow-lt);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; min-height: 46px;
+}
+.lightbox-caption { flex: 1; color: var(--ink); font-size: 13px; font-weight: 600; }
+.lightbox-member { font-size: 12px; color: var(--muted); }
+.lightbox-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(28,20,0,.45); color: #fff; border: none;
+  cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.lightbox-close:hover { background: rgba(28,20,0,.7); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✦ Yuuma Server</div>
+    <div class="hero-title">🎨 共通リスト</div>
+    <div class="hero-sub">同じジャンル・好きなものを持つメンバーを見つけよう</div>
+    <nav class="hero-nav">
+      <a href="./index.html">← メンバー名簿</a>
+      <a href="./register.html" class="cta">＋ 登録・更新する</a>
+    </nav>
+  </div>
+</div>
+
+<div class="content">
+
+<div class="filter-card">
+  <div class="filter-card-hdr">
+    <span class="filter-card-title">✦ 絞り込む</span>
+    <button class="btn-clear" onclick="clearAll()">クリア</button>
+  </div>
+  <div class="filter-body">
+
+    <div class="filter-section">
+      <div class="filter-section-label">メンバー名で探す</div>
+      <div class="sim-row">
+        <div class="sim-ac-wrap">
+          <input class="sim-input" type="text" id="sim-input" placeholder="名前を入力して候補から選んでください" autocomplete="off">
+          <div class="ac-list" id="sim-input-list"></div>
+        </div>
+        <button class="btn-sim" onclick="simSearch()">この人で探す</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-section-label">描いているジャンル <span class="multi-note">複数選択可</span></div>
+      <div class="chips" id="genre-chips"><span class="no-chips">読み込み中...</span></div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-section-label">好きなもの</div>
+      <div class="chips" id="fav-chips"><span class="no-chips">読み込み中...</span></div>
+    </div>
+
+    <div class="active-filters" id="active-filters" style="display:none">
+      <span class="active-filters-label">選択中：</span>
+      <div class="active-tags" id="active-tags"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="result-header">
+  <div class="result-count" id="result-count"></div>
+  <div class="sort-note" id="sort-note" style="display:none">一致数が多い順に表示</div>
+</div>
+
+<div class="cards-grid" id="cards"></div>
+<div class="no-result" id="no-result" style="display:none">該当するメンバーが見つかりませんでした</div>
+<div class="loading" id="loading">読み込み中...</div>
+
+</div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="">
+    <div class="lightbox-footer">
+      <span class="lightbox-caption" id="lightbox-caption"></span>
+      <span class="lightbox-member" id="lightbox-member"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://htvdxfmutrpbkgrbymii.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dmR4Zm11dHJwYmtncmJ5bWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MjQ5NjksImV4cCI6MjA5MjQwMDk2OX0.0sLGflDEuu4Y-V6JwdR7nUsl2yPS-kyGB-aLHUM4tEA';
+const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+
+let allData = [];
+let memberUrls = {};
+let illustMap = {};
+let activeGenres = new Set();
+let activeFavs = new Set();
+let simName = '';
+
+function escH(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function setupSimAC() {
+  const input = document.getElementById('sim-input');
+  const listEl = document.getElementById('sim-input-list');
+  let activeIdx = -1;
+  const getNames = () => allData.map(d => d.member_name);
+
+  function filtered(q) {
+    const all = getNames();
+    if (!q) return all.slice(0, 40);
+    return all.filter(s => s.toLowerCase().includes(q.toLowerCase())).slice(0, 40);
+  }
+
+  function build() {
+    const q = input.value.trim();
+    const hits = filtered(q);
+    listEl.innerHTML = ''; activeIdx = -1;
+    if (!hits.length) {
+      const div = document.createElement('div'); div.className = 'ac-empty'; div.textContent = '候補がありません';
+      listEl.appendChild(div);
+    } else {
+      hits.forEach(s => {
+        const div = document.createElement('div'); div.className = 'ac-item';
+        if (q) {
+          const idx = s.toLowerCase().indexOf(q.toLowerCase());
+          if (idx >= 0) div.innerHTML = escH(s.slice(0, idx)) + '<strong>' + escH(s.slice(idx, idx + q.length)) + '</strong>' + escH(s.slice(idx + q.length));
+          else div.textContent = s;
+        } else { div.textContent = s; }
+        div.addEventListener('mousedown', e => { e.preventDefault(); input.value = s; listEl.style.display = 'none'; simSearch(); });
+        listEl.appendChild(div);
+      });
+    }
+    listEl.style.display = 'block';
+  }
+
+  function updateActive() {
+    const items = listEl.querySelectorAll('.ac-item');
+    items.forEach((el, i) => el.classList.toggle('ac-active', i === activeIdx));
+    if (activeIdx >= 0 && items[activeIdx]) items[activeIdx].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('focus', () => build());
+  input.addEventListener('input', () => build());
+  input.addEventListener('blur', () => { setTimeout(() => { listEl.style.display = 'none'; activeIdx = -1; }, 160); });
+  input.addEventListener('keydown', e => {
+    const items = listEl.querySelectorAll('.ac-item');
+    if (listEl.style.display === 'none') { if (e.key === 'ArrowDown' || e.key === 'Enter') build(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); updateActive(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, -1); updateActive(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (activeIdx >= 0 && items[activeIdx]) items[activeIdx].dispatchEvent(new MouseEvent('mousedown')); else { listEl.style.display = 'none'; simSearch(); } }
+    else if (e.key === 'Escape') { listEl.style.display = 'none'; activeIdx = -1; }
+  });
+}
+
+async function loadData() {
+  try {
+    const [creatorData, illData] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/creators?select=name,interests,genres,link&order=id.asc', { headers: SB_HEADERS }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/member_illustrations?select=*&order=created_at.asc',      { headers: SB_HEADERS }).then(r => r.json())
+    ]);
+
+    allData = Array.isArray(creatorData) ? creatorData.map(row => {
+      const favs    = row.interests ? row.interests.split('、').map(s => s.trim()).filter(Boolean) : [];
+      const genres  = row.genres    ? row.genres.split(',').map(s => s.trim()).filter(Boolean)    : [];
+      return { member_name: row.name, genres, favorites: favs, link: row.link };
+    }) : [];
+
+    memberUrls = {};
+    allData.forEach(d => { memberUrls[d.member_name] = d.link; });
+
+    illustMap = {};
+    if (Array.isArray(illData)) illData.forEach(item => {
+      if (!illustMap[item.member_name]) illustMap[item.member_name] = [];
+      illustMap[item.member_name].push(item);
+    });
+
+    buildFilterChips();
+    setupSimAC();
+    renderCards();
+  } catch (e) {
+    document.getElementById('loading').textContent = 'データの読み込みに失敗しました';
+    console.error(e);
+  }
+}
+
+function buildFilterChips() {
+  const genreCounts = {}, favCounts = {};
+  allData.forEach(d => {
+    d.genres.forEach(g => { if (g) genreCounts[g] = (genreCounts[g] || 0) + 1; });
+    d.favorites.forEach(f => { if (f) favCounts[f] = (favCounts[f] || 0) + 1; });
+  });
+  const renderChips = (containerId, counts, type, activeSet) => {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    if (!sorted.length) { el.innerHTML = '<span class="no-chips">まだ登録がありません</span>'; return; }
+    sorted.forEach(([val, cnt]) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (activeSet.has(val) ? ' active' : '');
+      chip.innerHTML = escH(val) + '<span class="cnt">' + cnt + '</span>';
+      chip.addEventListener('click', () => { if (type === 'genre') toggleGenre(val); else toggleFav(val); });
+      el.appendChild(chip);
+    });
+  };
+  renderChips('genre-chips', genreCounts, 'genre', activeGenres);
+  renderChips('fav-chips', favCounts, 'fav', activeFavs);
+}
+
+function updateChipUI() {
+  document.querySelectorAll('#genre-chips .chip').forEach(c => {
+    c.classList.toggle('active', activeGenres.has(c.childNodes[0].textContent));
+  });
+  document.querySelectorAll('#fav-chips .chip').forEach(c => {
+    c.classList.toggle('active', activeFavs.has(c.childNodes[0].textContent));
+  });
+}
+
+function toggleGenre(g) {
+  if (activeGenres.has(g)) activeGenres.delete(g); else activeGenres.add(g);
+  updateChipUI(); renderCards(); updateActiveFilters();
+}
+function toggleFav(f) {
+  if (activeFavs.has(f)) activeFavs.delete(f); else activeFavs.add(f);
+  updateChipUI(); renderCards(); updateActiveFilters();
+}
+
+function simSearch() {
+  const name = document.getElementById('sim-input').value.trim();
+  if (!name) return;
+  const me = allData.find(d => d.member_name === name);
+  if (!me) { return; }
+  simName = name; activeGenres = new Set(); activeFavs = new Set();
+  me.genres.forEach(g => activeGenres.add(g));
+  me.favorites.forEach(f => activeFavs.add(f));
+  updateChipUI(); renderCards(); updateActiveFilters();
+}
+
+function clearSimName() {
+  simName = '';
+  document.getElementById('sim-input').value = '';
+  renderCards(); updateActiveFilters();
+}
+
+function clearAll() {
+  activeGenres = new Set(); activeFavs = new Set(); simName = '';
+  document.getElementById('sim-input').value = '';
+  updateChipUI(); renderCards(); updateActiveFilters();
+}
+
+function updateActiveFilters() {
+  const container = document.getElementById('active-filters');
+  const tagsEl    = document.getElementById('active-tags');
+  const tags = [];
+  if (simName) {
+    tags.push({ type: 'name', value: simName });
+  }
+  activeGenres.forEach(g => tags.push({ type: 'genre', value: g }));
+  activeFavs.forEach(f => tags.push({ type: 'fav',   value: f }));
+  tagsEl.innerHTML = tags.map(t =>
+    '<span class="active-tag type-' + t.type + '">' + escH(t.value) +
+    '<button class="active-tag-x" data-type="' + t.type + '" data-value="' + escH(t.value) + '">✕</button></span>'
+  ).join('');
+  container.style.display = tags.length ? '' : 'none';
+}
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.active-tag-x');
+  if (!btn) return;
+  const type  = btn.dataset.type;
+  const value = btn.dataset.value;
+  if (type === 'name')  clearSimName();
+  else if (type === 'genre') toggleGenre(value);
+  else if (type === 'fav')   toggleFav(value);
+});
+
+function renderCards() {
+  const hasFilter = activeGenres.size > 0 || activeFavs.size > 0;
+  let scored = allData.map(d => {
+    let score = 0;
+    d.genres.forEach(g => { if (activeGenres.has(g)) score++; });
+    d.favorites.forEach(f => { if (activeFavs.has(f)) score++; });
+    return Object.assign({}, d, { score });
+  });
+  let displayed;
+  if (hasFilter) {
+    displayed = scored.filter(d => { if (simName && d.member_name === simName) return false; return d.score > 0; });
+    displayed.sort((a, b) => b.score - a.score || a.member_name.localeCompare(b.member_name));
+  } else {
+    displayed = scored.sort((a, b) => a.member_name.localeCompare(b.member_name));
+  }
+
+  const container = document.getElementById('cards');
+  const noResult = document.getElementById('no-result');
+  const loading = document.getElementById('loading');
+  const countEl = document.getElementById('result-count');
+  const sortNote = document.getElementById('sort-note');
+  loading.style.display = 'none';
+
+  if (!allData.length) {
+    container.innerHTML = ''; noResult.style.display = 'block';
+    noResult.textContent = 'まだ登録されたメンバーがいません。「登録・更新する」から登録してみましょう！';
+    countEl.textContent = ''; sortNote.style.display = 'none'; return;
+  }
+  if (!displayed.length) {
+    container.innerHTML = ''; noResult.style.display = 'block';
+    noResult.textContent = '該当するメンバーが見つかりませんでした';
+    countEl.textContent = ''; sortNote.style.display = 'none'; return;
+  }
+  noResult.style.display = 'none';
+  sortNote.style.display = hasFilter ? '' : 'none';
+  if (simName) countEl.textContent = simName + ' さんと共通リストが一致するメンバー：' + displayed.length + ' 人';
+  else if (hasFilter) countEl.textContent = '絞り込み結果：' + displayed.length + ' 人';
+  else countEl.textContent = '登録メンバー：' + displayed.length + ' 人';
+
+  container.innerHTML = displayed.map(d => {
+    const url = d.link;
+    const nameHtml = url ? '<a href="' + escH(url) + '" target="_blank">' + escH(d.member_name) + '</a>' : escH(d.member_name);
+    const scoreBadge = (hasFilter && d.score > 0) ? '<span class="score-badge">' + d.score + ' 個一致</span>' : '';
+    const genreHtml = d.genres.length ? d.genres.map(g => { const hit = hasFilter && activeGenres.has(g); return '<span class="tag genre' + (hit ? ' hit' : '') + '">' + escH(g) + '</span>'; }).join('') : '<span class="empty-tag">未設定</span>';
+    const favsHtml = d.favorites.length ? d.favorites.map(f => { const hit = hasFilter && activeFavs.has(f); return '<span class="tag fav' + (hit ? ' hit' : '') + '">' + escH(f) + '</span>'; }).join('') : '<span class="empty-tag">未設定</span>';
+    const illusts = illustMap[d.member_name] || [];
+    let illustHtml = '';
+    if (illusts.length) {
+      const MAX_THUMB = 4; const shown = illusts.slice(0, MAX_THUMB); const rest = illusts.length - MAX_THUMB;
+      const thumbs = shown.map((item, idx) => '<div class="illust-thumb-item" data-member="' + escH(d.member_name) + '" data-idx="' + idx + '"><img src="' + escH(item.image_url) + '" alt="' + escH(item.caption || '') + '" loading="lazy"></div>').join('');
+      const moreBtn = rest > 0 ? '<div class="illust-more" data-member="' + escH(d.member_name) + '" data-idx="0">+' + rest + '</div>' : '';
+      illustHtml = '<div class="card-illust"><div class="card-illust-label">イラスト</div><div class="illust-thumbs">' + thumbs + moreBtn + '</div></div>';
+    }
+    return '<div class="member-card' + (hasFilter && d.score > 0 ? ' matched' : '') + '">'
+      + '<div class="card-top"><div class="card-name">' + nameHtml + '</div>' + scoreBadge + '</div>'
+      + '<div class="card-section"><div class="card-section-label">描いているジャンル</div>' + genreHtml + '</div>'
+      + '<div class="card-section"><div class="card-section-label">好きなもの</div><div class="tags-row">' + favsHtml + '</div></div>'
+      + illustHtml + '</div>';
+  }).join('');
+}
+
+document.getElementById('cards').addEventListener('click', e => {
+  const thumb = e.target.closest('.illust-thumb-item, .illust-more');
+  if (!thumb) return;
+  openLightbox(thumb.dataset.member, parseInt(thumb.dataset.idx || '0', 10));
+});
+
+function openLightbox(memberName, idx) {
+  const items = illustMap[memberName] || [];
+  if (!items.length) return;
+  const item = items[idx] || items[0];
+  document.getElementById('lightbox-img').src = item.image_url;
+  document.getElementById('lightbox-caption').textContent = item.caption || '';
+  document.getElementById('lightbox-member').textContent = memberName;
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+  document.getElementById('lightbox-img').src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox') || e.target.id === 'lightbox-close') closeLightbox();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+loadData();
+</script>
+</body>
+</html>

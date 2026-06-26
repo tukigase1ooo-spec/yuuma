@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ユウマ鯖 好み登録・更新</title>
+<style>
+:root {
+  --ink:        #1C1400;
+  --ink-soft:   #5C4810;
+  --bg:         #FFFFF2;
+  --yellow:     #FFD000;
+  --yellow-hi:  #FFE566;
+  --yellow-lt:  #FFF4C0;
+  --yellow-pale:#FFFCE8;
+  --purple:     #5C4EE5;
+  --pur-light:  #EDE9FC;
+  --pur-border: #C5BDF0;
+  --pur-dark:   #3730A3;
+  --surface:    #FFFFFF;
+  --muted:      #7A6820;
+  --border:     #EAD890;
+  --green:      #1E7A50;
+  --green-bg:   #E8F5EE;
+  --green-bdr:  #5ECFAA;
+  --red:        #A83E28;
+  --red-bg:     #FDE8E8;
+  --red-bdr:    #E8705A;
+  --radius:     18px;
+  --shadow:     0 2px 20px rgba(80,60,0,.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(circle, #FFE566 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── ヒーロー ── */
+.hero {
+  background: linear-gradient(135deg, #FFB800 0%, #FFD600 45%, #FFE566 75%, #FFF8C0 100%);
+  padding: 44px 20px 36px;
+  color: var(--ink); position: relative; overflow: hidden;
+  border-radius: 0 0 36px 36px; margin-bottom: 28px;
+}
+.hero::before {
+  content: ''; position: absolute;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(255,255,255,.65) 0%, transparent 62%);
+  top: -130px; right: -60px; pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(255,140,0,.22) 0%, transparent 65%);
+  bottom: -70px; left: 10%; pointer-events: none;
+}
+.hero-inner { max-width: 560px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+.hero-title { font-size: 28px; font-weight: 900; letter-spacing: -.03em; margin-bottom: 6px; }
+.hero-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 22px; font-weight: 500; }
+.hero-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-nav a {
+  font-size: 12px; font-weight: 700; padding: 7px 16px; border-radius: 24px;
+  text-decoration: none; transition: all .15s;
+  border: 2px solid rgba(0,0,0,.14); color: var(--ink);
+  background: rgba(255,255,255,.55); backdrop-filter: blur(4px);
+}
+.hero-nav a:hover { background: rgba(255,255,255,.88); border-color: rgba(0,0,0,.22); transform: translateY(-1px); }
+
+/* ── コンテンツ ── */
+.content { max-width: 560px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ── カード ── */
+.card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  margin-bottom: 14px; box-shadow: var(--shadow);
+  transition: border-color .15s, box-shadow .15s;
+}
+.card:hover { border-color: var(--yellow); }
+.card-hdr {
+  background: linear-gradient(90deg, var(--yellow-lt) 0%, var(--yellow-pale) 100%);
+  border-bottom: 2px solid var(--border); padding: 13px 20px;
+}
+.card-title { font-size: 14px; font-weight: 800; color: var(--ink-soft); margin-bottom: 2px; }
+.card-desc { font-size: 12px; color: var(--muted); }
+.card-body { padding: 20px; }
+
+/* ── フォーム ── */
+.form-row { margin-bottom: 18px; }
+.form-row:last-child { margin-bottom: 0; }
+label.fl { font-size: 13px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 6px; }
+label.fl .req { color: #D94800; margin-left: 2px; }
+label.fl .opt { font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 4px; }
+.form-note { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.divider { border: none; border-top: 2px solid var(--border); margin: 18px 0; }
+
+/* ── オートコンプリート ── */
+.ac-wrap { position: relative; }
+.ac-input {
+  width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px;
+  font-size: 14px; font-family: inherit; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  color: var(--ink); background: var(--yellow-pale);
+}
+.ac-input:focus {
+  border-color: var(--yellow); background: var(--surface);
+  box-shadow: 0 0 0 4px rgba(255,208,0,.18);
+}
+.ac-input.invalid { border-color: var(--red-bdr); background: #fff9f9; }
+.ac-list {
+  display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(80,60,0,.14); overflow: hidden; max-height: 220px; overflow-y: auto;
+}
+.ac-item {
+  padding: 9px 14px; font-size: 13px; cursor: pointer; color: var(--ink);
+  border-bottom: 1px solid var(--yellow-pale); transition: background .1s;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.ac-active { background: var(--yellow-lt); color: var(--ink); }
+.ac-item.ac-new { color: var(--green); }
+.ac-new-label {
+  font-size: 10px; font-weight: 800; background: var(--green-bg); color: var(--green);
+  border: 1.5px solid var(--green-bdr); border-radius: 10px; padding: 1px 7px;
+  margin-right: 6px; vertical-align: middle;
+}
+.ac-empty { padding: 9px 14px; font-size: 12px; color: var(--muted); }
+
+/* ── 登録済み表示 ── */
+.existing-box {
+  background: var(--yellow-pale); border: 2px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; display: none;
+}
+.existing-box-title { font-size: 12px; font-weight: 800; color: var(--ink-soft); margin-bottom: 8px; }
+.existing-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.ex-tag {
+  font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600;
+  background: var(--surface); border: 2px solid var(--border); color: var(--ink-soft);
+}
+.ex-tag.genre { background: var(--pur-light); border-color: var(--pur-border); color: var(--purple); }
+
+/* ── ボタン / メッセージ ── */
+.btn-submit {
+  width: 100%; padding: 13px; font-size: 15px; font-weight: 800;
+  border-radius: 12px; background: var(--purple); color: #fff;
+  border: none; cursor: pointer; font-family: inherit;
+  transition: background .15s, box-shadow .15s; margin-top: 6px;
+  box-shadow: 0 3px 14px rgba(92,78,229,.3);
+}
+.btn-submit:hover { background: var(--pur-dark); box-shadow: 0 5px 20px rgba(92,78,229,.4); }
+.btn-submit:disabled { background: #A9A0E8; cursor: not-allowed; box-shadow: none; }
+.msg { margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: 13px; display: none; font-weight: 600; }
+.msg.success { background: var(--green-bg); color: var(--green); border: 2px solid var(--green-bdr); }
+.msg.error   { background: var(--red-bg);   color: var(--red);   border: 2px solid var(--red-bdr); }
+
+/* ── イラストカード ── */
+.illust-notice { font-size: 13px; color: var(--muted); padding: 24px 0; text-align: center; }
+.upload-zone {
+  border: 2.5px dashed var(--border); border-radius: 12px; padding: 26px 16px;
+  text-align: center; cursor: pointer; transition: all .15s;
+  position: relative; margin-bottom: 12px; background: var(--yellow-pale);
+}
+.upload-zone:hover, .upload-zone.drag-over { border-color: var(--yellow); background: var(--yellow-lt); }
+.upload-zone input[type=file] { display: none; }
+.upload-icon { font-size: 30px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+.upload-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.preview-wrap { display: none; flex-direction: column; align-items: center; gap: 10px; }
+.preview-img { max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid var(--border); object-fit: contain; }
+.btn-clear-preview {
+  font-size: 12px; padding: 5px 14px; border-radius: 8px; font-weight: 600;
+  background: var(--red-bg); color: var(--red); border: 2px solid var(--red-bdr); cursor: pointer; font-family: inherit;
+}
+
+.upload-fields { display: none; margin-bottom: 12px; }
+.upload-caption {
+  width: 100%; padding: 9px 13px; border: 2px solid var(--border);
+  border-radius: 10px; font-size: 13px; font-family: inherit; outline: none;
+  background: var(--yellow-pale); color: var(--ink); transition: border-color .15s;
+}
+.upload-caption:focus { border-color: var(--yellow); background: var(--surface); }
+.btn-upload {
+  width: 100%; padding: 12px; font-size: 14px; font-weight: 800;
+  border-radius: 12px; background: var(--green); color: #fff;
+  border: none; cursor: pointer; font-family: inherit;
+  transition: background .15s; margin-top: 8px;
+  box-shadow: 0 3px 12px rgba(30,122,80,.25);
+}
+.btn-upload:hover { background: #155738; }
+.btn-upload:disabled { background: #88C9B0; cursor: not-allowed; box-shadow: none; }
+
+.illust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.illust-thumb-wrap {
+  position: relative; border-radius: 12px; overflow: hidden;
+  aspect-ratio: 1; background: var(--yellow-pale); border: 2px solid var(--border);
+}
+.illust-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+.illust-caption-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(28,20,0,.55); color: #fff; font-size: 10px;
+  padding: 3px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.btn-del-illust {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(168,62,40,.85); color: #fff; border: none;
+  border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+}
+.illust-thumb-wrap:hover .btn-del-illust { display: flex; }
+.illust-empty { font-size: 12px; color: var(--muted); padding: 8px 0 14px; }
+
+.view-btn {
+  display: block; text-align: center; font-size: 13px; color: var(--ink-soft);
+  text-decoration: none; margin-top: 4px; padding: 12px;
+  border: 2px solid var(--border); border-radius: 12px;
+  background: var(--yellow-lt); font-weight: 700; transition: all .15s;
+}
+.view-btn:hover { background: var(--yellow-hi); border-color: var(--yellow); }
+
+/* ── ジャンルチップ ── */
+.multi-note {
+  font-size: 10px; font-weight: 700; background: var(--pur-light);
+  color: var(--purple); border: 1.5px solid var(--pur-border);
+  border-radius: 8px; padding: 1px 7px; vertical-align: middle; font-style: normal;
+}
+.genre-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 28px; }
+.g-chip {
+  font-size: 12px; padding: 5px 14px; border-radius: 24px;
+  border: 2px solid var(--border); background: var(--yellow-pale);
+  color: var(--ink-soft); cursor: pointer; transition: all .12s;
+  user-select: none; font-weight: 600;
+}
+.g-chip:hover { background: var(--yellow-lt); border-color: var(--yellow); color: var(--ink); }
+.g-chip.active { background: var(--yellow); color: var(--ink); border-color: #CCA800; font-weight: 700; }
+.no-chips { font-size: 12px; color: var(--muted); }
+.genre-add-row { display: flex; gap: 8px; align-items: flex-start; }
+.btn-genre-add {
+  padding: 10px 16px; font-size: 13px; font-weight: 700; border-radius: 10px;
+  background: var(--yellow-lt); color: var(--ink); border: 2px solid var(--border);
+  cursor: pointer; font-family: inherit; white-space: nowrap; transition: all .15s; flex-shrink: 0;
+}
+.btn-genre-add:hover { background: var(--yellow-hi); border-color: var(--yellow); }
+
+/* ── 選択中コンテンツ ── */
+.selected-content {
+  background: var(--yellow-pale); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; display: none;
+}
+.selected-content-title { font-size: 11px; font-weight: 800; color: var(--ink-soft); margin-bottom: 10px; }
+.selected-rows { display: flex; flex-direction: column; gap: 8px; }
+.selected-row { display: flex; align-items: flex-start; gap: 8px; }
+.selected-row-label {
+  font-size: 10px; font-weight: 800; color: var(--muted);
+  letter-spacing: .05em; flex-shrink: 0; padding-top: 5px; min-width: 68px;
+}
+.sel-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.sel-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 700; padding: 4px 8px 4px 12px; border-radius: 24px;
+}
+.sel-tag.type-name  { background: var(--purple); color: #fff; padding-right: 12px; }
+.sel-tag.type-genre { background: var(--pur-light); color: var(--purple); border: 2px solid var(--pur-border); }
+.sel-tag.type-fav   { background: var(--yellow-hi); color: var(--ink); border: 2px solid #CCA800; padding-right: 12px; }
+.sel-tag-x {
+  font-size: 11px; cursor: pointer; opacity: .65;
+  background: none; border: none; color: inherit; padding: 0; font-weight: 900; line-height: 1;
+}
+.sel-tag-x:hover { opacity: 1; }
+.sel-empty { font-size: 11px; color: var(--muted); padding-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✦ Yuuma Server</div>
+    <div class="hero-title">好み登録・更新</div>
+    <div class="hero-sub">あなたが描いているジャンルや好きなものを登録してください</div>
+    <nav class="hero-nav">
+      <a href="./interests.html">← 共通リストへ</a>
+    </nav>
+  </div>
+</div>
+
+<div class="content">
+
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-title">プロフィール登録</div>
+    <div class="card-desc">メンバー名を選択して、ジャンルと好きなものを登録しましょう</div>
+  </div>
+  <div class="card-body">
+
+    <div class="form-row">
+      <label class="fl">メンバー名<span class="req">*</span></label>
+      <div class="ac-wrap">
+        <input class="ac-input" type="text" id="f-name" placeholder="名前を入力して候補から選んでください" autocomplete="off">
+        <div class="ac-list" id="f-name-list"></div>
+      </div>
+      <div class="form-note">メンバー名簿に登録されている名前のみ選択できます</div>
+    </div>
+
+    <div class="selected-content" id="selected-content">
+      <div class="selected-content-title">選択中の内容</div>
+      <div class="selected-rows">
+        <div class="selected-row">
+          <span class="selected-row-label">名前</span>
+          <div class="sel-tags" id="sel-name-tags"></div>
+        </div>
+        <div class="selected-row">
+          <span class="selected-row-label">ジャンル</span>
+          <div class="sel-tags" id="sel-genre-tags"></div>
+        </div>
+        <div class="selected-row">
+          <span class="selected-row-label">好きなもの</span>
+          <div class="sel-tags" id="sel-fav-tags"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="form-row">
+      <label class="fl">描いているジャンル<span class="req">*</span> <span class="multi-note">複数選択可</span></label>
+      <div class="genre-chips" id="genre-chips"><span class="no-chips">読み込み中...</span></div>
+      <div class="genre-add-row">
+        <div class="ac-wrap" style="flex:1">
+          <input class="ac-input" type="text" id="f-genre-new" placeholder="新しいジャンルを追加..." autocomplete="off">
+          <div class="ac-list" id="f-genre-list"></div>
+        </div>
+        <button type="button" class="btn-genre-add" id="btn-genre-add">追加</button>
+      </div>
+      <div class="form-note">チップを選択するか、入力して新規追加できます</div>
+    </div>
+
+    <div class="form-row">
+      <label class="fl">好きなもの ①<span class="req">*</span></label>
+      <div class="ac-wrap">
+        <input class="ac-input" type="text" id="f-fav1" placeholder="例：ポケモン、ラブライブ！、原神 など" autocomplete="off" oninput="updateSelectedContent()">
+        <div class="ac-list" id="f-fav1-list"></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="fl">好きなもの ②<span class="opt">任意</span></label>
+      <div class="ac-wrap">
+        <input class="ac-input" type="text" id="f-fav2" placeholder="" autocomplete="off" oninput="updateSelectedContent()">
+        <div class="ac-list" id="f-fav2-list"></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="fl">好きなもの ③<span class="opt">任意</span></label>
+      <div class="ac-wrap">
+        <input class="ac-input" type="text" id="f-fav3" placeholder="" autocomplete="off" oninput="updateSelectedContent()">
+        <div class="ac-list" id="f-fav3-list"></div>
+      </div>
+      <div class="form-note">一覧にないものは新規追加されます</div>
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">登録する</button>
+    <div class="msg" id="form-msg"></div>
+
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-title">🎨 イラスト登録</div>
+    <div class="card-desc">登録したイラストは「共通リスト」のメンバーカードに表示されます</div>
+  </div>
+  <div class="card-body">
+
+    <div class="illust-notice" id="illust-notice">メンバー名を先に選択してください</div>
+
+    <div id="illust-section" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">登録中のイラスト</div>
+      <div class="illust-grid" id="illust-grid"></div>
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="f-image" accept="image/jpeg,image/png,image/gif,image/webp">
+        <div id="upload-placeholder">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text">クリックまたはドラッグ＆ドロップで画像を選択</div>
+          <div class="upload-note">JPEG / PNG / GIF / WebP・最大 5MB</div>
+        </div>
+        <div class="preview-wrap" id="preview-wrap">
+          <img class="preview-img" id="preview-img" src="" alt="プレビュー">
+          <button class="btn-clear-preview" onclick="clearPreview(event)">✕ やり直す</button>
+        </div>
+      </div>
+
+      <div class="upload-fields" id="upload-fields">
+        <input class="upload-caption" type="text" id="f-caption" placeholder="コメント（任意・例：ポケモンファンアート）">
+        <button class="btn-upload" id="btn-upload" onclick="uploadIllust()">アップロード</button>
+      </div>
+
+      <div class="msg" id="illust-msg"></div>
+    </div>
+
+  </div>
+</div>
+
+<a class="view-btn" href="./interests.html">共通リストで確認する →</a>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://htvdxfmutrpbkgrbymii.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dmR4Zm11dHJwYmtncmJ5bWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MjQ5NjksImV4cCI6MjA5MjQwMDk2OX0.0sLGflDEuu4Y-V6JwdR7nUsl2yPS-kyGB-aLHUM4tEA';
+const SB      = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+const SB_JSON = Object.assign({ 'Content-Type': 'application/json' }, SB);
+
+let memberNames = [], genreList = [], favoriteList = [];
+let existingData = {}, illustsCurrent = [], currentMember = '', pendingFile = null;
+let selectedGenres = new Set();
+
+function escH(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setupAC(inputId, listId, getItems, opts) {
+  const input = document.getElementById(inputId);
+  const listEl = document.getElementById(listId);
+  let activeIdx = -1;
+
+  function filtered(q) {
+    const all = getItems();
+    if (!q) return all.slice(0, 40);
+    const lq = q.toLowerCase();
+    return all.filter(s => s.toLowerCase().includes(lq)).slice(0, 40);
+  }
+
+  function build() {
+    const q = input.value.trim();
+    const hits = filtered(q);
+    const exactMatch = getItems().some(s => s.toLowerCase() === q.toLowerCase());
+    listEl.innerHTML = ''; activeIdx = -1;
+    if (opts.allowNew && q && !exactMatch) {
+      const div = document.createElement('div');
+      div.className = 'ac-item ac-new';
+      div.innerHTML = '<span class="ac-new-label">新規</span>' + escH(q);
+      div.addEventListener('mousedown', e => { e.preventDefault(); pick(q); });
+      listEl.appendChild(div);
+    }
+    if (!hits.length && !(opts.allowNew && q && !exactMatch)) {
+      const div = document.createElement('div'); div.className = 'ac-empty'; div.textContent = '候補がありません';
+      listEl.appendChild(div);
+    } else {
+      hits.forEach(s => {
+        const div = document.createElement('div'); div.className = 'ac-item';
+        if (q) {
+          const idx = s.toLowerCase().indexOf(q.toLowerCase());
+          if (idx >= 0) div.innerHTML = escH(s.slice(0, idx)) + '<strong>' + escH(s.slice(idx, idx + q.length)) + '</strong>' + escH(s.slice(idx + q.length));
+          else div.textContent = s;
+        } else { div.textContent = s; }
+        div.addEventListener('mousedown', e => { e.preventDefault(); pick(s); });
+        listEl.appendChild(div);
+      });
+    }
+    listEl.style.display = 'block';
+  }
+
+  function pick(val) {
+    input.value = val; input.classList.remove('invalid');
+    listEl.style.display = 'none'; activeIdx = -1;
+    if (opts.onPick) opts.onPick(val);
+  }
+
+  function updateActive() {
+    const items = listEl.querySelectorAll('.ac-item');
+    items.forEach((el, i) => el.classList.toggle('ac-active', i === activeIdx));
+    if (activeIdx >= 0 && items[activeIdx]) items[activeIdx].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('focus', () => build());
+  input.addEventListener('input', () => build());
+  input.addEventListener('blur', () => {
+    setTimeout(() => { listEl.style.display = 'none'; activeIdx = -1; }, 160);
+    if (opts.strict) {
+      const val = input.value.trim();
+      input.classList.toggle('invalid', !!val && !getItems().some(s => s.toLowerCase() === val.toLowerCase()));
+    }
+  });
+  input.addEventListener('keydown', e => {
+    const items = listEl.querySelectorAll('.ac-item');
+    if (listEl.style.display === 'none') { if (e.key === 'ArrowDown' || e.key === 'Enter') build(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); updateActive(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, -1); updateActive(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (activeIdx >= 0 && items[activeIdx]) items[activeIdx].dispatchEvent(new MouseEvent('mousedown')); else listEl.style.display = 'none'; }
+    else if (e.key === 'Escape') { listEl.style.display = 'none'; activeIdx = -1; }
+  });
+}
+
+function onNamePick(name) {
+  currentMember = name; hideMsg('form-msg');
+  const existing = existingData[name];
+  const btn = document.getElementById('btn-submit');
+  if (existing) {
+    selectedGenres = new Set(
+      (existing.genre || '').split(',').map(s => s.trim()).filter(Boolean)
+    );
+    document.getElementById('f-fav1').value = existing.favorite1 || '';
+    document.getElementById('f-fav2').value = existing.favorite2 || '';
+    document.getElementById('f-fav3').value = existing.favorite3 || '';
+    btn.textContent = '更新する';
+  } else {
+    selectedGenres = new Set();
+    ['f-fav1','f-fav2','f-fav3'].forEach(id => { document.getElementById(id).value = ''; });
+    btn.textContent = '登録する';
+  }
+  renderGenreChips();
+  updateSelectedContent();
+  document.getElementById('illust-notice').style.display = 'none';
+  document.getElementById('illust-section').style.display = '';
+  loadIllusts(name);
+}
+
+function renderGenreChips() {
+  const el = document.getElementById('genre-chips');
+  if (!genreList.length) { el.innerHTML = '<span class="no-chips">ジャンルがまだありません</span>'; return; }
+  el.innerHTML = genreList.map(g =>
+    '<div class="g-chip' + (selectedGenres.has(g) ? ' active' : '') + '" data-genre="' + escH(g) + '">' + escH(g) + '</div>'
+  ).join('');
+}
+
+function toggleGenreChip(g) {
+  if (selectedGenres.has(g)) selectedGenres.delete(g); else selectedGenres.add(g);
+  renderGenreChips();
+  updateSelectedContent();
+}
+
+function addNewGenre() {
+  const input = document.getElementById('f-genre-new');
+  const val = input.value.trim();
+  if (!val) return;
+  selectedGenres.add(val);
+  if (!genreList.some(s => s.toLowerCase() === val.toLowerCase())) genreList.push(val);
+  input.value = '';
+  document.getElementById('f-genre-list').style.display = 'none';
+  renderGenreChips();
+  updateSelectedContent();
+}
+
+function updateSelectedContent() {
+  const container = document.getElementById('selected-content');
+  const nameEl    = document.getElementById('sel-name-tags');
+  const genreEl   = document.getElementById('sel-genre-tags');
+  const favEl     = document.getElementById('sel-fav-tags');
+  const name = document.getElementById('f-name').value.trim();
+  const fav1 = document.getElementById('f-fav1').value.trim();
+  const fav2 = document.getElementById('f-fav2').value.trim();
+  const fav3 = document.getElementById('f-fav3').value.trim();
+  const favs = [fav1, fav2, fav3].filter(Boolean);
+  nameEl.innerHTML = name
+    ? '<span class="sel-tag type-name">' + escH(name) + '</span>'
+    : '<span class="sel-empty">未選択</span>';
+  genreEl.innerHTML = selectedGenres.size
+    ? [...selectedGenres].map(g =>
+        '<span class="sel-tag type-genre">' + escH(g) +
+        '<button class="sel-tag-x" data-genre="' + escH(g) + '">✕</button></span>'
+      ).join('')
+    : '<span class="sel-empty">未選択</span>';
+  favEl.innerHTML = favs.length
+    ? favs.map(f => '<span class="sel-tag type-fav">' + escH(f) + '</span>').join('')
+    : '<span class="sel-empty">未入力</span>';
+  container.style.display = (name || selectedGenres.size || favs.length) ? 'block' : 'none';
+}
+
+async function init() {
+  try {
+    const [creatorData, genData, favData] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/creators?select=name,genres,interests&order=id.asc', { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/genres?select=name&order=name.asc',                  { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/favorites?select=name&order=name.asc',               { headers: SB }).then(r => r.json()),
+    ]);
+    memberNames  = Array.isArray(creatorData) ? creatorData.map(r => r.name) : [];
+    genreList    = Array.isArray(genData) ? genData.map(r => r.name) : [];
+    favoriteList = Array.isArray(favData) ? favData.map(r => r.name) : [];
+    if (Array.isArray(creatorData)) {
+      creatorData.forEach(r => {
+        const favs = r.interests ? r.interests.split('、').map(s => s.trim()).filter(Boolean) : [];
+        existingData[r.name] = {
+          genre: r.genres || '',
+          favorite1: favs[0] || '',
+          favorite2: favs[1] || '',
+          favorite3: favs[2] || '',
+        };
+      });
+    }
+    renderGenreChips();
+    setupAC('f-name',     'f-name-list',  () => memberNames,  { strict: true, onPick: onNamePick });
+    setupAC('f-genre-new','f-genre-list', () => genreList,    { allowNew: true, onPick: (val) => { selectedGenres.add(val); if (!genreList.some(s => s.toLowerCase() === val.toLowerCase())) genreList.push(val); document.getElementById('f-genre-new').value = ''; renderGenreChips(); updateSelectedContent(); } });
+    setupAC('f-fav1',     'f-fav1-list',  () => favoriteList, { allowNew: true, onPick: () => updateSelectedContent() });
+    setupAC('f-fav2',     'f-fav2-list',  () => favoriteList, { allowNew: true, onPick: () => updateSelectedContent() });
+    setupAC('f-fav3',     'f-fav3-list',  () => favoriteList, { allowNew: true, onPick: () => updateSelectedContent() });
+  } catch (e) { console.error('init error', e); showMsg('form-msg', 'error', 'データの読み込みに失敗しました'); }
+}
+
+async function ensureTag(table, name, localList) {
+  if (!name) return;
+  if (localList.some(s => s.toLowerCase() === name.toLowerCase())) return;
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: Object.assign({ 'Prefer': 'resolution=ignore-duplicates,return=minimal' }, SB_JSON),
+    body: JSON.stringify({ name })
+  });
+  if (res.ok && !localList.includes(name)) localList.push(name);
+}
+
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  el.textContent = text; el.className = 'msg ' + type; el.style.display = 'block';
+}
+function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
+
+async function submitForm() {
+  const name  = document.getElementById('f-name').value.trim();
+  const fav1  = document.getElementById('f-fav1').value.trim();
+  const fav2  = document.getElementById('f-fav2').value.trim();
+  const fav3  = document.getElementById('f-fav3').value.trim();
+
+  if (!name)  { showMsg('form-msg', 'error', 'メンバー名を入力して候補から選択してください'); return; }
+  if (!memberNames.some(s => s.toLowerCase() === name.toLowerCase())) {
+    showMsg('form-msg', 'error', '「' + name + '」はメンバー名簿に存在しません');
+    document.getElementById('f-name').classList.add('invalid'); return;
+  }
+  if (!selectedGenres.size) { showMsg('form-msg', 'error', '描いているジャンルを1つ以上選択してください'); return; }
+  if (!fav1)  { showMsg('form-msg', 'error', '好きなもの①を入力してください'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = '送信中...'; hideMsg('form-msg');
+  try {
+    const genreArr = [...selectedGenres];
+    await Promise.all([
+      ...genreArr.map(g => ensureTag('genres', g, genreList)),
+      ensureTag('favorites', fav1,  favoriteList),
+      fav2 ? ensureTag('favorites', fav2, favoriteList) : Promise.resolve(),
+      fav3 ? ensureTag('favorites', fav3, favoriteList) : Promise.resolve()
+    ]);
+    const interests = [fav1, fav2, fav3].filter(Boolean).join('、');
+    const body = { genres: genreArr.join(', '), interests };
+    const res = await fetch(SUPABASE_URL + '/rest/v1/creators?name=eq.' + encodeURIComponent(name), {
+      method: 'PATCH',
+      headers: Object.assign({ 'Prefer': 'return=minimal' }, SB_JSON),
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      existingData[name] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'' };
+      showMsg('form-msg', 'success', '登録しました！「共通リスト」で確認できます。');
+      btn.textContent = '更新する'; onNamePick(name);
+    } else {
+      showMsg('form-msg', 'error', '送信に失敗しました。Supabaseの設定を確認してください。');
+      console.error(res.status, await res.text());
+    }
+  } catch (e) { showMsg('form-msg', 'error', 'ネットワークエラー：' + e.message); }
+  finally {
+    btn.disabled = false;
+    if (btn.textContent === '送信中...') btn.textContent = existingData[document.getElementById('f-name').value.trim()] ? '更新する' : '登録する';
+  }
+}
+
+async function loadIllusts(memberName) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/member_illustrations?member_name=eq.' + encodeURIComponent(memberName) + '&select=*&order=created_at.desc', { headers: SB });
+    const data = await res.json();
+    illustsCurrent = Array.isArray(data) ? data : [];
+    renderIllusts();
+  } catch (e) { console.error('loadIllusts error', e); }
+}
+
+function renderIllusts() {
+  const grid = document.getElementById('illust-grid');
+  if (!illustsCurrent.length) { grid.innerHTML = '<div class="illust-empty">まだイラストが登録されていません</div>'; return; }
+  grid.innerHTML = '';
+  illustsCurrent.forEach(item => {
+    const wrap = document.createElement('div'); wrap.className = 'illust-thumb-wrap';
+    const img = document.createElement('img'); img.className = 'illust-thumb'; img.src = item.image_url; img.alt = item.caption || '';
+    wrap.appendChild(img);
+    if (item.caption) { const cap = document.createElement('div'); cap.className = 'illust-caption-badge'; cap.textContent = item.caption; wrap.appendChild(cap); }
+    const delBtn = document.createElement('button'); delBtn.className = 'btn-del-illust'; delBtn.textContent = '✕'; delBtn.title = '削除';
+    delBtn.addEventListener('click', () => deleteIllust(item.id, item.storage_path));
+    wrap.appendChild(delBtn); grid.appendChild(wrap);
+  });
+}
+
+function handleFile(file) {
+  if (!file.type.startsWith('image/')) { showMsg('illust-msg', 'error', '画像ファイルを選択してください'); return; }
+  if (file.size > 5 * 1024 * 1024) { showMsg('illust-msg', 'error', 'ファイルサイズは5MB以内にしてください'); return; }
+  hideMsg('illust-msg'); pendingFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('upload-placeholder').style.display = 'none';
+    document.getElementById('preview-wrap').style.display = 'flex';
+    document.getElementById('upload-fields').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('upload-zone');
+  const input = document.getElementById('f-image');
+  zone.addEventListener('click', e => { if (e.target === zone || e.target.id === 'upload-placeholder' || e.target.closest('#upload-placeholder')) { if (!pendingFile) input.click(); } });
+  input.addEventListener('change', () => { if (input.files[0]) handleFile(input.files[0]); });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+});
+
+function clearPreview(e) {
+  if (e) e.stopPropagation();
+  pendingFile = null;
+  document.getElementById('preview-img').src = '';
+  document.getElementById('f-image').value = '';
+  document.getElementById('f-caption').value = '';
+  document.getElementById('upload-placeholder').style.display = '';
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('upload-fields').style.display = 'none';
+  hideMsg('illust-msg');
+}
+
+async function uploadIllust() {
+  if (!pendingFile || !currentMember) return;
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = true; btn.textContent = 'アップロード中...'; hideMsg('illust-msg');
+  try {
+    const ext = pendingFile.name.split('.').pop().toLowerCase() || 'jpg';
+    const uid = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+    const path = uid + '.' + ext;
+    const storageRes = await fetch(SUPABASE_URL + '/storage/v1/object/illustrations/' + path, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': pendingFile.type },
+      body: pendingFile
+    });
+    if (!storageRes.ok) { showMsg('illust-msg', 'error', 'Storage へのアップロードに失敗しました：' + await storageRes.text()); return; }
+    const imageUrl = SUPABASE_URL + '/storage/v1/object/public/illustrations/' + path;
+    const caption = document.getElementById('f-caption').value.trim();
+    const dbRes = await fetch(SUPABASE_URL + '/rest/v1/member_illustrations', {
+      method: 'POST',
+      headers: Object.assign({ 'Prefer': 'return=representation' }, SB_JSON),
+      body: JSON.stringify({ member_name: currentMember, storage_path: path, image_url: imageUrl, caption: caption || null })
+    });
+    if (!dbRes.ok) { showMsg('illust-msg', 'error', 'DB への登録に失敗しました'); return; }
+    const [newRecord] = await dbRes.json();
+    illustsCurrent.unshift(newRecord); renderIllusts(); clearPreview(); showMsg('illust-msg', 'success', 'アップロードしました！');
+  } catch (e) { showMsg('illust-msg', 'error', 'エラー：' + e.message); console.error(e); }
+  finally { btn.disabled = false; btn.textContent = 'アップロード'; }
+}
+
+async function deleteIllust(id, storagePath) {
+  if (!confirm('このイラストを削除しますか？')) return;
+  try {
+    await Promise.all([
+      fetch(SUPABASE_URL + '/storage/v1/object/illustrations/' + storagePath, { method: 'DELETE', headers: SB }),
+      fetch(SUPABASE_URL + '/rest/v1/member_illustrations?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: SB_JSON })
+    ]);
+    illustsCurrent = illustsCurrent.filter(i => i.id !== id); renderIllusts();
+  } catch (e) { alert('削除に失敗しました：' + e.message); }
+}
+
+document.getElementById('genre-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.g-chip');
+  if (chip) toggleGenreChip(chip.dataset.genre);
+});
+
+document.getElementById('btn-genre-add').addEventListener('click', addNewGenre);
+
+document.getElementById('f-genre-new').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addNewGenre(); }
+});
+
+document.getElementById('sel-genre-tags').addEventListener('click', e => {
+  const btn = e.target.closest('.sel-tag-x');
+  if (btn) toggleGenreChip(btn.dataset.genre);
+});
+
+init();
+</script>
+</body>
+</html>

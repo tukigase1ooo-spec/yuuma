@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ユウマ鯖 メンバー名簿</title>
+<style>
+:root {
+  --ink:        #1C1400;
+  --ink-soft:   #5C4810;
+  --bg:         #FFFFF2;
+  --yellow:     #FFD000;
+  --yellow-hi:  #FFE566;
+  --yellow-lt:  #FFF4C0;
+  --yellow-pale:#FFFCE8;
+  --purple:     #5C4EE5;
+  --pur-light:  #EDE9FC;
+  --pur-border: #C5BDF0;
+  --pur-dark:   #3730A3;
+  --surface:    #FFFFFF;
+  --muted:      #7A6820;
+  --border:     #EAD890;
+  --discord:    #5865F2;
+  --radius:     18px;
+  --shadow:     0 2px 20px rgba(80,60,0,.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(circle, #FFE566 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── ヒーロー ── */
+.hero {
+  background: linear-gradient(135deg, #FFB800 0%, #FFD600 45%, #FFE566 75%, #FFF8C0 100%);
+  padding: 44px 20px 36px;
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 36px 36px;
+  margin-bottom: 28px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,.65) 0%, transparent 62%);
+  top: -160px; right: -80px;
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(255,140,0,.22) 0%, transparent 65%);
+  bottom: -90px; left: 5%;
+  pointer-events: none;
+}
+.hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px;
+}
+.hero-title {
+  font-size: 32px; font-weight: 900; letter-spacing: -.03em;
+  margin-bottom: 6px; line-height: 1.1;
+}
+.hero-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 22px; font-weight: 500; }
+.hero-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-nav a {
+  font-size: 12px; font-weight: 700;
+  padding: 7px 16px; border-radius: 24px;
+  text-decoration: none; transition: all .15s;
+  border: 2px solid rgba(0,0,0,.14);
+  color: var(--ink);
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(4px);
+}
+.hero-nav a:hover {
+  background: rgba(255,255,255,.88);
+  border-color: rgba(0,0,0,.22);
+  transform: translateY(-1px);
+}
+.hero-nav a.cta {
+  background: var(--purple); border-color: transparent; color: #fff;
+}
+.hero-nav a.cta:hover { background: var(--pur-dark); }
+
+/* ── コンテンツ ── */
+.content { max-width: 860px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ── 検索 ── */
+.search-wrap { margin-bottom: 20px; position: relative; }
+.search-wrap::before {
+  content: '🔍';
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; pointer-events: none;
+}
+#search {
+  width: 100%; max-width: 420px;
+  padding: 11px 14px 11px 42px;
+  border: 2px solid var(--border); border-radius: 28px;
+  font-size: 14px; font-family: inherit;
+  background: var(--surface); color: var(--ink);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+  box-shadow: var(--shadow);
+}
+#search:focus { border-color: var(--yellow); box-shadow: 0 0 0 4px rgba(255,208,0,.2); }
+
+.total { font-size: 13px; color: var(--muted); margin-bottom: 18px; font-weight: 600; }
+
+/* ── グループカード ── */
+.group {
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 2px solid var(--border);
+  transition: border-color .15s, box-shadow .15s;
+}
+.group:hover {
+  border-color: var(--yellow);
+  box-shadow: 0 4px 28px rgba(80,60,0,.13);
+}
+.group-hdr {
+  background: linear-gradient(90deg, var(--yellow-lt) 0%, var(--yellow-pale) 100%);
+  padding: 12px 18px;
+  font-size: 13px; font-weight: 800; color: var(--ink-soft);
+  border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.group-hdr .right { display: flex; align-items: center; gap: 8px; }
+.group-hdr .cnt { font-size: 12px; color: var(--muted); font-weight: 500; }
+.group-hdr .discord-link {
+  font-size: 11px; font-weight: 700; color: var(--discord);
+  text-decoration: none; padding: 3px 11px;
+  border: 2px solid var(--discord); border-radius: 14px;
+  transition: all .15s;
+}
+.group-hdr .discord-link:hover { background: var(--discord); color: #fff; }
+
+.member-list { display: flex; flex-wrap: wrap; gap: 7px; padding: 14px 18px; }
+.member {
+  background: var(--yellow-pale);
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: 5px 15px;
+  font-size: 13px; color: var(--ink);
+  transition: all .15s;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 500;
+}
+.member:hover {
+  background: var(--yellow-lt);
+  border-color: var(--yellow);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(80,60,0,.12);
+}
+a.member { color: var(--purple); border-color: var(--pur-border); background: var(--pur-light); }
+a.member:hover { background: #ddd8fa; border-color: var(--purple); }
+.member.hidden { display: none; }
+.group.all-hidden { display: none; }
+
+#no-result {
+  display: none; text-align: center;
+  color: var(--muted); padding: 56px 16px; font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✦ Yuuma Server</div>
+    <div class="hero-title">メンバー名簿</div>
+    <div class="hero-sub">自己紹介1〜14 まとめ</div>
+    <nav class="hero-nav">
+      <a href="./calendar.html">📅 イベントカレンダー</a>
+      <a href="./interests.html">🎨 共通リスト</a>
+    </nav>
+  </div>
+</div>
+
+<div class="content">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="名前で検索..." oninput="filterMembers()">
+  </div>
+  <div class="total" id="total"></div>
+  <div id="groups"></div>
+  <div id="no-result">該当するメンバーが見つかりませんでした</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://htvdxfmutrpbkgrbymii.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dmR4Zm11dHJwYmtncmJ5bWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MjQ5NjksImV4cCI6MjA5MjQwMDk2OX0.0sLGflDEuu4Y-V6JwdR7nUsl2yPS-kyGB-aLHUM4tEA';
+const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+
+let data = [];
+
+function getName(m){ return typeof m === 'string' ? m : m.n; }
+function getUrl(m){ return typeof m === 'string' ? null : m.u; }
+
+function renderMembers() {
+  const container = document.getElementById('groups');
+  container.innerHTML = '';
+  const totalEl = document.getElementById('total');
+  const totalCount = data.reduce(function(acc, g){ return acc + g.members.length; }, 0);
+  totalEl.textContent = '総メンバー数：' + totalCount + '人';
+
+  data.forEach(function(g, gi) {
+    const div = document.createElement('div');
+    div.className = 'group';
+    div.id = 'g' + gi;
+    const memberHtml = g.members.map(function(m, mi) {
+      const name = getName(m);
+      const url  = getUrl(m);
+      return url
+        ? '<a class="member" id="m' + gi + '_' + mi + '" href="' + url + '" target="_blank">' + name + '</a>'
+        : '<span class="member" id="m' + gi + '_' + mi + '">' + name + '</span>';
+    }).join('');
+    div.innerHTML =
+      '<div class="group-hdr">' + g.group +
+      '<div class="right"><span class="cnt">' + g.members.length + '人</span>' +
+      '<a class="discord-link" href="' + g.url + '" target="_blank">Discordで開く</a></div></div>' +
+      '<div class="member-list" id="ml' + gi + '">' + memberHtml + '</div>';
+    container.appendChild(div);
+  });
+}
+
+async function loadMembers() {
+  document.getElementById('total').textContent = '読み込み中...';
+  const res  = await fetch(SUPABASE_URL + '/rest/v1/members?select=name,discord_url,group_name,group_url&order=id.asc', { headers: SB_HEADERS });
+  const rows = await res.json();
+  const groupMap = {}, groupOrder = [];
+  rows.forEach(function(row) {
+    if (!groupMap[row.group_name]) {
+      groupMap[row.group_name] = { group: row.group_name, url: row.group_url, members: [] };
+      groupOrder.push(row.group_name);
+    }
+    groupMap[row.group_name].members.push({ n: row.name, u: row.discord_url });
+  });
+  data = groupOrder.map(function(g){ return groupMap[g]; });
+  renderMembers();
+}
+
+function filterMembers() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let anyVisible = false;
+  data.forEach(function(g, gi) {
+    let groupHasVisible = false;
+    g.members.forEach(function(m, mi) {
+      const el = document.getElementById('m' + gi + '_' + mi);
+      if (!el) return;
+      const match = !q || getName(m).toLowerCase().includes(q);
+      el.classList.toggle('hidden', !match);
+      if (match) { groupHasVisible = true; anyVisible = true; }
+    });
+    const gEl = document.getElementById('g' + gi);
+    if (gEl) gEl.classList.toggle('all-hidden', !groupHasVisible);
+  });
+  document.getElementById('no-result').style.display = anyVisible ? 'none' : 'block';
+}
+
+loadMembers();
+</script>
+</body>
+</html>
