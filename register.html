@@ -654,18 +654,24 @@ async function submitForm() {
     ]);
     const favoritesStr = [fav1, fav2, fav3].filter(Boolean).join('、');
     const body = { genres: genreArr.join(', '), favorites: favoritesStr };
+    console.log('PATCH creators id=', currentMemberId, body);
     const res = await fetch(SUPABASE_URL + '/rest/v1/creators?id=eq.' + currentMemberId, {
       method: 'PATCH',
-      headers: Object.assign({ 'Prefer': 'return=minimal' }, SB_JSON),
+      headers: Object.assign({ 'Prefer': 'return=representation' }, SB_JSON),
       body: JSON.stringify(body)
     });
-    if (res.ok) {
+    const updated = res.ok ? await res.json() : null;
+    console.log('PATCH result:', res.status, updated);
+    if (res.ok && Array.isArray(updated) && updated.length > 0) {
       existingData[currentMemberId] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'' };
       showMsg('form-msg', 'success', '登録しました！「共通リスト」で確認できます。');
       btn.textContent = '更新する'; onNamePick(name);
+    } else if (res.ok && Array.isArray(updated) && updated.length === 0) {
+      showMsg('form-msg', 'error', 'creatorsテーブルにid=' + currentMemberId + 'の行が見つかりません。Supabaseでcreatorsテーブルを確認してください。');
+      console.error('PATCH matched 0 rows. currentMemberId:', currentMemberId);
     } else {
-      showMsg('form-msg', 'error', '送信に失敗しました。Supabaseの設定を確認してください。');
-      console.error(res.status, await res.text());
+      showMsg('form-msg', 'error', '送信に失敗しました（' + res.status + '）');
+      console.error(res.status, updated);
     }
   } catch (e) { showMsg('form-msg', 'error', 'ネットワークエラー：' + e.message); }
   finally {
