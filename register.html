@@ -436,27 +436,48 @@ function setupAC(inputId, listId, getItems, opts) {
   });
 }
 
-function onNamePick(name) {
+async function onNamePick(name) {
   currentMember = name;
   currentMemberId = memberMap[name] || null;
   hideMsg('form-msg');
-  const existing = existingData[currentMemberId];
-  const hasData  = existing && (existing.genre || existing.favorite1);
+
+  selectedGenres = new Set();
+  ['f-fav1','f-fav2','f-fav3'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('f-illust-url').value = '';
+  renderGenreChips();
+  updateSelectedContent();
+
   const btn = document.getElementById('btn-submit');
-  if (existing) {
-    selectedGenres = new Set(
-      (existing.genre || '').split(',').map(s => s.trim()).filter(Boolean)
+  btn.textContent = '読み込み中...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/creators?id=eq.' + currentMemberId + '&select=genres,favorites,illustration_url',
+      { headers: SB }
     );
-    document.getElementById('f-fav1').value = existing.favorite1 || '';
-    document.getElementById('f-fav2').value = existing.favorite2 || '';
-    document.getElementById('f-fav3').value = existing.favorite3 || '';
-    document.getElementById('f-illust-url').value = existing.illustration_url || '';
-  } else {
-    selectedGenres = new Set();
-    ['f-fav1','f-fav2','f-fav3'].forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('f-illust-url').value = '';
+    const rows = await res.json();
+    const data = Array.isArray(rows) && rows.length ? rows[0] : null;
+
+    if (data && (data.genres || data.favorites)) {
+      selectedGenres = new Set(
+        (data.genres || '').split(',').map(s => s.trim()).filter(Boolean)
+      );
+      const favs = (data.favorites || '').split('、').map(s => s.trim()).filter(Boolean);
+      document.getElementById('f-fav1').value = favs[0] || '';
+      document.getElementById('f-fav2').value = favs[1] || '';
+      document.getElementById('f-fav3').value = favs[2] || '';
+      document.getElementById('f-illust-url').value = data.illustration_url || '';
+      btn.textContent = '更新する';
+    } else {
+      btn.textContent = '登録する';
+    }
+  } catch (e) {
+    console.error('onNamePick fetch error', e);
+    btn.textContent = '登録する';
+  } finally {
+    btn.disabled = false;
   }
-  btn.textContent = hasData ? '更新する' : '登録する';
+
   renderGenreChips();
   updateSelectedContent();
   previewIllust();
