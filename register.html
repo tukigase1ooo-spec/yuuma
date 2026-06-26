@@ -317,29 +317,16 @@ label.fl .opt { font-size: 11px; color: var(--muted); font-weight: 400; margin-l
       <div class="form-note">一覧にないものは新規追加されます</div>
     </div>
 
-    <button class="btn-submit" id="btn-submit" onclick="submitForm()">登録する</button>
-    <div class="msg" id="form-msg"></div>
-
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-hdr">
-    <div class="card-title">📱 SNS登録</div>
-    <div class="card-desc">X（Twitter）のURLを登録すると「共通リスト」のメンバーカードに表示されます</div>
-  </div>
-  <div class="card-body">
-
-    <div class="illust-notice" id="illust-notice">メンバー名を先に選択してください</div>
-
-    <div id="illust-section" style="display:none">
-      <div class="form-label">X / Twitter URL <span class="tag-opt">任意</span></div>
+    <div class="form-row" id="illust-section" style="display:none">
+      <label class="fl">SNS登録 <span class="opt">任意</span></label>
       <input class="ac-input" type="url" id="f-illust-url" placeholder="https://x.com/ユーザー名" autocomplete="off" oninput="previewIllust()" style="width:100%">
       <div class="illust-preview" id="illust-preview">
         <img id="illust-preview-img" src="" alt="プレビュー">
       </div>
-      <div class="msg" id="illust-msg"></div>
     </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">登録する</button>
+    <div class="msg" id="form-msg"></div>
 
   </div>
 </div>
@@ -481,7 +468,6 @@ async function onNamePick(name) {
   renderGenreChips();
   updateSelectedContent();
   previewIllust();
-  document.getElementById('illust-notice').style.display = 'none';
   document.getElementById('illust-section').style.display = '';
 }
 
