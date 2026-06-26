@@ -160,60 +160,13 @@ label.fl .opt { font-size: 11px; color: var(--muted); font-weight: 400; margin-l
 
 /* ── イラストカード ── */
 .illust-notice { font-size: 13px; color: var(--muted); padding: 24px 0; text-align: center; }
-.upload-zone {
-  border: 2.5px dashed var(--border); border-radius: 12px; padding: 26px 16px;
-  text-align: center; cursor: pointer; transition: all .15s;
-  position: relative; margin-bottom: 12px; background: var(--yellow-pale);
+.illust-preview {
+  margin-top: 12px; display: none;
+  border-radius: 12px; overflow: hidden;
+  border: 2px solid var(--border); background: var(--yellow-pale);
+  max-height: 220px; text-align: center;
 }
-.upload-zone:hover, .upload-zone.drag-over { border-color: var(--yellow); background: var(--yellow-lt); }
-.upload-zone input[type=file] { display: none; }
-.upload-icon { font-size: 30px; margin-bottom: 8px; }
-.upload-text { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
-.upload-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-.preview-wrap { display: none; flex-direction: column; align-items: center; gap: 10px; }
-.preview-img { max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid var(--border); object-fit: contain; }
-.btn-clear-preview {
-  font-size: 12px; padding: 5px 14px; border-radius: 8px; font-weight: 600;
-  background: var(--red-bg); color: var(--red); border: 2px solid var(--red-bdr); cursor: pointer; font-family: inherit;
-}
-
-.upload-fields { display: none; margin-bottom: 12px; }
-.upload-caption {
-  width: 100%; padding: 9px 13px; border: 2px solid var(--border);
-  border-radius: 10px; font-size: 13px; font-family: inherit; outline: none;
-  background: var(--yellow-pale); color: var(--ink); transition: border-color .15s;
-}
-.upload-caption:focus { border-color: var(--yellow); background: var(--surface); }
-.btn-upload {
-  width: 100%; padding: 12px; font-size: 14px; font-weight: 800;
-  border-radius: 12px; background: var(--green); color: #fff;
-  border: none; cursor: pointer; font-family: inherit;
-  transition: background .15s; margin-top: 8px;
-  box-shadow: 0 3px 12px rgba(30,122,80,.25);
-}
-.btn-upload:hover { background: #155738; }
-.btn-upload:disabled { background: #88C9B0; cursor: not-allowed; box-shadow: none; }
-
-.illust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-.illust-thumb-wrap {
-  position: relative; border-radius: 12px; overflow: hidden;
-  aspect-ratio: 1; background: var(--yellow-pale); border: 2px solid var(--border);
-}
-.illust-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
-.illust-caption-badge {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(28,20,0,.55); color: #fff; font-size: 10px;
-  padding: 3px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.btn-del-illust {
-  position: absolute; top: 4px; right: 4px;
-  background: rgba(168,62,40,.85); color: #fff; border: none;
-  border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
-  cursor: pointer; display: none; align-items: center; justify-content: center;
-}
-.illust-thumb-wrap:hover .btn-del-illust { display: flex; }
-.illust-empty { font-size: 12px; color: var(--muted); padding: 8px 0 14px; }
+.illust-preview img { max-width: 100%; max-height: 220px; object-fit: contain; display: block; margin: 0 auto; }
 
 .view-btn {
   display: block; text-align: center; font-size: 13px; color: var(--ink-soft);
@@ -373,34 +326,18 @@ label.fl .opt { font-size: 11px; color: var(--muted); font-weight: 400; margin-l
 <div class="card">
   <div class="card-hdr">
     <div class="card-title">🎨 イラスト登録</div>
-    <div class="card-desc">登録したイラストは「共通リスト」のメンバーカードに表示されます</div>
+    <div class="card-desc">XのポストURLを貼り付けると「共通リスト」のメンバーカードに表示されます</div>
   </div>
   <div class="card-body">
 
     <div class="illust-notice" id="illust-notice">メンバー名を先に選択してください</div>
 
     <div id="illust-section" style="display:none">
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">登録中のイラスト</div>
-      <div class="illust-grid" id="illust-grid"></div>
-
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" id="f-image" accept="image/jpeg,image/png,image/gif,image/webp">
-        <div id="upload-placeholder">
-          <div class="upload-icon">🖼️</div>
-          <div class="upload-text">クリックまたはドラッグ＆ドロップで画像を選択</div>
-          <div class="upload-note">JPEG / PNG / GIF / WebP・最大 5MB</div>
-        </div>
-        <div class="preview-wrap" id="preview-wrap">
-          <img class="preview-img" id="preview-img" src="" alt="プレビュー">
-          <button class="btn-clear-preview" onclick="clearPreview(event)">✕ やり直す</button>
-        </div>
+      <div class="form-label">イラストのURL <span class="tag-opt">任意</span></div>
+      <input class="ac-input" type="url" id="f-illust-url" placeholder="https://x.com/..." autocomplete="off" oninput="previewIllust()" style="width:100%">
+      <div class="illust-preview" id="illust-preview">
+        <img id="illust-preview-img" src="" alt="プレビュー">
       </div>
-
-      <div class="upload-fields" id="upload-fields">
-        <input class="upload-caption" type="text" id="f-caption" placeholder="コメント（任意・例：ポケモンファンアート）">
-        <button class="btn-upload" id="btn-upload" onclick="uploadIllust()">アップロード</button>
-      </div>
-
       <div class="msg" id="illust-msg"></div>
     </div>
 
@@ -419,7 +356,7 @@ const SB_JSON = Object.assign({ 'Content-Type': 'application/json' }, SB);
 
 let memberNames = [], genreList = [], favoriteList = [];
 let existingData = {}, memberMap = {};
-let illustsCurrent = [], currentMember = '', currentMemberId = null, pendingFile = null;
+let currentMember = '', currentMemberId = null;
 let selectedGenres = new Set();
 
 function escH(s) {
@@ -512,17 +449,19 @@ function onNamePick(name) {
     document.getElementById('f-fav1').value = existing.favorite1 || '';
     document.getElementById('f-fav2').value = existing.favorite2 || '';
     document.getElementById('f-fav3').value = existing.favorite3 || '';
+    document.getElementById('f-illust-url').value = existing.illustration_url || '';
     btn.textContent = '更新する';
   } else {
     selectedGenres = new Set();
     ['f-fav1','f-fav2','f-fav3'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('f-illust-url').value = '';
     btn.textContent = '登録する';
   }
   renderGenreChips();
   updateSelectedContent();
+  previewIllust();
   document.getElementById('illust-notice').style.display = 'none';
   document.getElementById('illust-section').style.display = '';
-  loadIllusts(name);
 }
 
 function renderGenreChips() {
@@ -580,7 +519,7 @@ async function init() {
   try {
     const [memberData, creatorData, genData, favData] = await Promise.all([
       fetch(SUPABASE_URL + '/rest/v1/members?select=id,name&order=id.asc',               { headers: SB }).then(r => r.json()),
-      fetch(SUPABASE_URL + '/rest/v1/creators?select=id,genres,favorites&order=id.asc',  { headers: SB }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/creators?select=id,genres,favorites,illustration_url&order=id.asc', { headers: SB }).then(r => r.json()),
       fetch(SUPABASE_URL + '/rest/v1/genres?select=name&order=name.asc',                 { headers: SB }).then(r => r.json()),
       fetch(SUPABASE_URL + '/rest/v1/favorites?select=name&order=name.asc',              { headers: SB }).then(r => r.json()),
     ]);
@@ -599,6 +538,7 @@ async function init() {
           favorite1: favs[0] || '',
           favorite2: favs[1] || '',
           favorite3: favs[2] || '',
+          illustration_url: r.illustration_url || '',
         };
       });
     }
@@ -609,6 +549,21 @@ async function init() {
     setupAC('f-fav2',     'f-fav2-list',  () => favoriteList, { allowNew: true, onPick: () => updateSelectedContent() });
     setupAC('f-fav3',     'f-fav3-list',  () => favoriteList, { allowNew: true, onPick: () => updateSelectedContent() });
   } catch (e) { console.error('init error', e); showMsg('form-msg', 'error', 'データの読み込みに失敗しました'); }
+}
+
+function previewIllust() {
+  const url = document.getElementById('f-illust-url').value.trim();
+  const wrap = document.getElementById('illust-preview');
+  const img  = document.getElementById('illust-preview-img');
+  if (url) {
+    img.src = url;
+    wrap.style.display = 'block';
+    img.onerror = () => { wrap.style.display = 'none'; };
+    img.onload  = () => { wrap.style.display = 'block'; };
+  } else {
+    wrap.style.display = 'none';
+    img.src = '';
+  }
 }
 
 async function ensureTag(table, name, localList) {
@@ -653,7 +608,8 @@ async function submitForm() {
       fav3 ? ensureTag('favorites', fav3, favoriteList) : Promise.resolve()
     ]);
     const favoritesStr = [fav1, fav2, fav3].filter(Boolean).join('、');
-    const body = { genres: genreArr.join(', '), favorites: favoritesStr };
+    const illustUrl = document.getElementById('f-illust-url').value.trim();
+    const body = { genres: genreArr.join(', '), favorites: favoritesStr, illustration_url: illustUrl || null };
     console.log('PATCH creators id=', currentMemberId, body);
     const res = await fetch(SUPABASE_URL + '/rest/v1/creators?id=eq.' + currentMemberId, {
       method: 'PATCH',
@@ -663,7 +619,7 @@ async function submitForm() {
     const updated = res.ok ? await res.json() : null;
     console.log('PATCH result:', res.status, updated);
     if (res.ok && Array.isArray(updated) && updated.length > 0) {
-      existingData[currentMemberId] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'' };
+      existingData[currentMemberId] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'', illustration_url: illustUrl };
       showMsg('form-msg', 'success', '登録しました！「共通リスト」で確認できます。');
       btn.textContent = '更新する'; onNamePick(name);
     } else if (res.ok && Array.isArray(updated) && updated.length === 0) {
@@ -680,104 +636,6 @@ async function submitForm() {
   }
 }
 
-async function loadIllusts(memberName) {
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/member_illustrations?member_name=eq.' + encodeURIComponent(memberName) + '&select=*&order=created_at.desc', { headers: SB });
-    const data = await res.json();
-    illustsCurrent = Array.isArray(data) ? data : [];
-    renderIllusts();
-  } catch (e) { console.error('loadIllusts error', e); }
-}
-
-function renderIllusts() {
-  const grid = document.getElementById('illust-grid');
-  if (!illustsCurrent.length) { grid.innerHTML = '<div class="illust-empty">まだイラストが登録されていません</div>'; return; }
-  grid.innerHTML = '';
-  illustsCurrent.forEach(item => {
-    const wrap = document.createElement('div'); wrap.className = 'illust-thumb-wrap';
-    const img = document.createElement('img'); img.className = 'illust-thumb'; img.src = item.image_url; img.alt = item.caption || '';
-    wrap.appendChild(img);
-    if (item.caption) { const cap = document.createElement('div'); cap.className = 'illust-caption-badge'; cap.textContent = item.caption; wrap.appendChild(cap); }
-    const delBtn = document.createElement('button'); delBtn.className = 'btn-del-illust'; delBtn.textContent = '✕'; delBtn.title = '削除';
-    delBtn.addEventListener('click', () => deleteIllust(item.id, item.storage_path));
-    wrap.appendChild(delBtn); grid.appendChild(wrap);
-  });
-}
-
-function handleFile(file) {
-  if (!file.type.startsWith('image/')) { showMsg('illust-msg', 'error', '画像ファイルを選択してください'); return; }
-  if (file.size > 5 * 1024 * 1024) { showMsg('illust-msg', 'error', 'ファイルサイズは5MB以内にしてください'); return; }
-  hideMsg('illust-msg'); pendingFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('preview-img').src = e.target.result;
-    document.getElementById('upload-placeholder').style.display = 'none';
-    document.getElementById('preview-wrap').style.display = 'flex';
-    document.getElementById('upload-fields').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const zone = document.getElementById('upload-zone');
-  const input = document.getElementById('f-image');
-  zone.addEventListener('click', e => { if (e.target === zone || e.target.id === 'upload-placeholder' || e.target.closest('#upload-placeholder')) { if (!pendingFile) input.click(); } });
-  input.addEventListener('change', () => { if (input.files[0]) handleFile(input.files[0]); });
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-});
-
-function clearPreview(e) {
-  if (e) e.stopPropagation();
-  pendingFile = null;
-  document.getElementById('preview-img').src = '';
-  document.getElementById('f-image').value = '';
-  document.getElementById('f-caption').value = '';
-  document.getElementById('upload-placeholder').style.display = '';
-  document.getElementById('preview-wrap').style.display = 'none';
-  document.getElementById('upload-fields').style.display = 'none';
-  hideMsg('illust-msg');
-}
-
-async function uploadIllust() {
-  if (!pendingFile || !currentMember) return;
-  const btn = document.getElementById('btn-upload');
-  btn.disabled = true; btn.textContent = 'アップロード中...'; hideMsg('illust-msg');
-  try {
-    const ext = pendingFile.name.split('.').pop().toLowerCase() || 'jpg';
-    const uid = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
-    const path = uid + '.' + ext;
-    const storageRes = await fetch(SUPABASE_URL + '/storage/v1/object/illustrations/' + path, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': pendingFile.type },
-      body: pendingFile
-    });
-    if (!storageRes.ok) { showMsg('illust-msg', 'error', 'Storage へのアップロードに失敗しました：' + await storageRes.text()); return; }
-    const imageUrl = SUPABASE_URL + '/storage/v1/object/public/illustrations/' + path;
-    const caption = document.getElementById('f-caption').value.trim();
-    const dbRes = await fetch(SUPABASE_URL + '/rest/v1/member_illustrations', {
-      method: 'POST',
-      headers: Object.assign({ 'Prefer': 'return=representation' }, SB_JSON),
-      body: JSON.stringify({ member_name: currentMember, storage_path: path, image_url: imageUrl, caption: caption || null })
-    });
-    if (!dbRes.ok) { showMsg('illust-msg', 'error', 'DB への登録に失敗しました'); return; }
-    const [newRecord] = await dbRes.json();
-    illustsCurrent.unshift(newRecord); renderIllusts(); clearPreview(); showMsg('illust-msg', 'success', 'アップロードしました！');
-  } catch (e) { showMsg('illust-msg', 'error', 'エラー：' + e.message); console.error(e); }
-  finally { btn.disabled = false; btn.textContent = 'アップロード'; }
-}
-
-async function deleteIllust(id, storagePath) {
-  if (!confirm('このイラストを削除しますか？')) return;
-  try {
-    await Promise.all([
-      fetch(SUPABASE_URL + '/storage/v1/object/illustrations/' + storagePath, { method: 'DELETE', headers: SB }),
-      fetch(SUPABASE_URL + '/rest/v1/member_illustrations?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: SB_JSON })
-    ]);
-    illustsCurrent = illustsCurrent.filter(i => i.id !== id); renderIllusts();
-  } catch (e) { alert('削除に失敗しました：' + e.message); }
-}
 
 document.getElementById('genre-chips').addEventListener('click', e => {
   const chip = e.target.closest('.g-chip');
