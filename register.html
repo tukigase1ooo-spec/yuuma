@@ -637,18 +637,20 @@ async function submitForm() {
       headers: Object.assign({ 'Prefer': 'return=representation' }, SB_JSON),
       body: JSON.stringify(body)
     });
-    const updated = res.ok ? await res.json() : null;
-    console.log('PATCH result:', res.status, updated);
+    let updated = null, errText = '';
+    if (res.ok) { updated = await res.json(); }
+    else { errText = await res.text(); }
+    console.log('PATCH result:', res.status, res.ok ? updated : errText);
     if (res.ok && Array.isArray(updated) && updated.length > 0) {
       existingData[currentMemberId] = { genre: [...selectedGenres].join(', '), favorite1: fav1, favorite2: fav2||'', favorite3: fav3||'', illustration_url: illustUrl };
       showMsg('form-msg', 'success', '登録しました！「共通リスト」で確認できます。');
       btn.textContent = '更新する'; onNamePick(name);
     } else if (res.ok && Array.isArray(updated) && updated.length === 0) {
-      showMsg('form-msg', 'error', 'creatorsテーブルにid=' + currentMemberId + 'の行が見つかりません。Supabaseでcreatorsテーブルを確認してください。');
+      showMsg('form-msg', 'error', 'creatorsテーブルにid=' + currentMemberId + 'の行が見つかりません。');
       console.error('PATCH matched 0 rows. currentMemberId:', currentMemberId);
     } else {
-      showMsg('form-msg', 'error', '送信に失敗しました（' + res.status + '）');
-      console.error(res.status, updated);
+      showMsg('form-msg', 'error', '送信に失敗しました（' + res.status + '）: ' + errText);
+      console.error(res.status, errText);
     }
   } catch (e) { showMsg('form-msg', 'error', 'ネットワークエラー：' + e.message); }
   finally {
