@@ -333,7 +333,7 @@ label.fl .opt { font-size: 11px; color: var(--muted); font-weight: 400; margin-l
     <div class="illust-notice" id="illust-notice">メンバー名を先に選択してください</div>
 
     <div id="illust-section" style="display:none">
-      <div class="form-label">イラストのURL <span class="tag-opt">任意</span></div>
+      <div class="form-label">X/Twitter 登録 <span class="tag-opt">任意</span></div>
       <input class="ac-input" type="url" id="f-illust-url" placeholder="https://x.com/..." autocomplete="off" oninput="previewIllust()" style="width:100%">
       <div class="illust-preview" id="illust-preview">
         <img id="illust-preview-img" src="" alt="プレビュー">
@@ -441,6 +441,7 @@ function onNamePick(name) {
   currentMemberId = memberMap[name] || null;
   hideMsg('form-msg');
   const existing = existingData[currentMemberId];
+  const hasData  = existing && (existing.genre || existing.favorite1);
   const btn = document.getElementById('btn-submit');
   if (existing) {
     selectedGenres = new Set(
@@ -450,13 +451,12 @@ function onNamePick(name) {
     document.getElementById('f-fav2').value = existing.favorite2 || '';
     document.getElementById('f-fav3').value = existing.favorite3 || '';
     document.getElementById('f-illust-url').value = existing.illustration_url || '';
-    btn.textContent = '更新する';
   } else {
     selectedGenres = new Set();
     ['f-fav1','f-fav2','f-fav3'].forEach(id => { document.getElementById(id).value = ''; });
     document.getElementById('f-illust-url').value = '';
-    btn.textContent = '登録する';
   }
+  btn.textContent = hasData ? '更新する' : '登録する';
   renderGenreChips();
   updateSelectedContent();
   previewIllust();
